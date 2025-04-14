@@ -26,7 +26,7 @@ namespace PluginSystem.Core
         /// Внутренний уникальный системный идентификатор плагина.
         /// Может быть сгенерирован при загрузке плагина.
         /// </summary>
-        public Guid SystemID { get; init; } = Guid.NewGuid();
+        public string SystemID { get; init; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Человекочитаемый идентификатор плагина, задается вручную.
@@ -52,7 +52,7 @@ namespace PluginSystem.Core
         {
             // Генерация уникального ID с помощью хелпера
             // Получить описание на нужном языке
-            SystemID = PluginHelper.GeneratePluginId([Name, Version]);
+            SystemID = PluginHelper.GeneratePluginId([Name, Version]).ToString();
         }
 
         /// <summary>

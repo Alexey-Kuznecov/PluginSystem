@@ -12,8 +12,17 @@ namespace PluginSystem.TestPlugins
             Name = "FaultyPlugin",
             Version = "1.0.0",
             Author = "Test Author",
-            SystemID = PluginHelper.GeneratePluginId("FaultyPlugin", "1.0.0")
+            SystemID = PluginHelper.GeneratePluginId(new[] { "CommandFaultyPlugin", "1.0.0" })
         };
+
+        public string Name => throw new NotImplementedException();
+
+        public string Version => throw new NotImplementedException();
+
+        public void Initialize(IPluginContext context)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Load()
         {
@@ -22,6 +31,11 @@ namespace PluginSystem.TestPlugins
 
             // Эмуляция ошибки при загрузке
             throw new InvalidOperationException("Ошибка при загрузке плагина.");
+        }
+
+        public void Shutdown()
+        {
+            throw new NotImplementedException();
         }
 
         public void Unload()
@@ -39,8 +53,17 @@ namespace PluginSystem.TestPlugins
             Name = "CommandFaultyPlugin",
             Version = "1.0.0",
             Author = "Test Author",
-            SystemID = PluginHelper.GeneratePluginId("CommandFaultyPlugin", "1.0.0")
+            SystemID = PluginHelper.GeneratePluginId(new[] { "CommandFaultyPlugin", "1.0.0" })
         };
+
+        public string Name => throw new NotImplementedException();
+
+        public string Version => throw new NotImplementedException();
+
+        public void Initialize(IPluginContext context)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Load()
         {
@@ -51,6 +74,11 @@ namespace PluginSystem.TestPlugins
             {
                 throw new ArgumentException("Ошибка при выполнении команды.");
             });
+        }
+
+        public void Shutdown()
+        {
+            throw new NotImplementedException();
         }
 
         public void Unload()
