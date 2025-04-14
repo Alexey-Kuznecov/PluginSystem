@@ -1,12 +1,13 @@
 ﻿
 using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace PluginSystem.Runtime
 {
     /// <summary>
     /// Контейнер для хранения и управления плагином.
     /// </summary>
-    public class PluginContainer
+    public class PluginContainer : IPluginContainer
     {
         public PluginInfo PluginInfo { get; private set; } // Информация о плагине
         public string? Name { get; private set; } // Имя контейнера (категория)
@@ -58,6 +59,9 @@ namespace PluginSystem.Runtime
             return commands;
         }
 
+        public IPluginContext GetContext(IPlugin plugin) => Context; // Возвращаем контекст плагина
+
+        public IPlugin? GetPlugin(string name) => Plugin; // Возвращаем текущий плагин
 
         /// <summary>
         /// Очищает контейнер, удаляя плагин.
@@ -67,5 +71,6 @@ namespace PluginSystem.Runtime
             Plugin?.Shutdown(); // Вызываем завершение работы плагина
             Plugin = null; // Убираем ссылку на плагин
         }
+
     }
 }

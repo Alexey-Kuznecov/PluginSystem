@@ -2,14 +2,18 @@
 namespace PluginSystem.Runtime
 {
     using PluginSystem.Core;
+    using PluginSystem.Core.PluginSystem.Core;
+    using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Менеджер плагинов, отвечающий за загрузку, выгрузку и управление плагинами.
     /// </summary>
-    public class PluginManager
+    public class PluginManager : IPluginManager
     {
         #region Поля
 
+        private readonly Dictionary<string, IPluginContainer> _pluginContainers = new(); // Контейнеры плагинов
         private readonly PluginLoader _loader = new(); // Загрузчик плагинов
         private readonly ILoggerService _logger = new NLogLoggerService(); // Логгер
         private readonly string _assemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
@@ -21,7 +25,10 @@ namespace PluginSystem.Runtime
         /// <summary>
         /// Коллекция загруженных плагинов, индексированных по их уникальному идентификатору.
         /// </summary>
-        public Dictionary<string, PluginContainer> LoadedPlugins = new();
+        public Dictionary<string, IPluginContainer> PluginContainers => _pluginContainers;
+
+        public event Action<IPlugin> OnPluginLoaded = delegate { };
+        public event Action<IPlugin> OnPluginUnloaded = delegate { };
 
         #endregion
 
@@ -85,7 +92,7 @@ namespace PluginSystem.Runtime
         /// <param name="systemId">Уникальный идентификатор плагина.</param>
         /// <returns><c>true</c>, если плагин уже загружен; в противном случае — <c>false</c>.</returns>
         private bool IsPluginAlreadyLoaded(string systemId) =>
-            LoadedPlugins.ContainsKey(systemId);
+            PluginContainers.ContainsKey(systemId);
 
         /// <summary>
         /// Регистрирует плагин в контейнере загруженных плагинов.
@@ -96,7 +103,8 @@ namespace PluginSystem.Runtime
         private bool RegisterPlugin(PluginInfo info, IPlugin plugin)
         {
             var container = new PluginContainer(info, plugin);
-            LoadedPlugins.Add(info.SystemID, container);
+            PluginContainers.Add(info.SystemID, container);
+            OnPluginLoaded?.Invoke(plugin); // вызов события
             return true;
         }
 
@@ -107,12 +115,56 @@ namespace PluginSystem.Runtime
         /// </summary>
         public void UnloadAll()
         {
-            foreach (var container in LoadedPlugins.Values)
+            foreach (var container in PluginContainers.Values)
             {
+                OnPluginUnloaded?.Invoke(container.Plugin); // уведомляем о выгрузке
                 container.Clear();
             }
-            LoadedPlugins.Clear();
+            PluginContainers.Clear();
             _logger.Info("Все плагины выгружены.");
         }
+
+        // Загружает все плагины и возвращает коллекцию их контейнеров
+        public IEnumerable<IPluginContainer> LoadAllPlugins()
+        {
+            var newlyLoaded = new List<IPluginContainer>();
+
+            foreach (var pluginDir in Directory.EnumerateDirectories(_assemblyPath))
+            {
+                var name = Path.GetFileName(pluginDir);
+                var previousCount = _pluginContainers.Count;
+
+                if (LoadPlugin(name) && _pluginContainers.Count > previousCount)
+                {
+                    // Последний добавленный — это и есть наш новый плагин
+                    var container = _pluginContainers.Values.Last();
+                    newlyLoaded.Add(container);
+                }
+            }
+
+            return newlyLoaded;
+        }
+
+
+        public IPlugin? GetPlugin(string pluginId) =>
+            _pluginContainers.Values
+                .FirstOrDefault(c => string.Equals(
+                    c.PluginInfo.SystemID, pluginId, StringComparison.OrdinalIgnoreCase))?.Plugin;
+
+
+        // Получение плагина по ID
+        public IPluginContainer? GetContainerById(string pluginId) =>
+        _pluginContainers.TryGetValue(
+            pluginId, out var container) ? container : null;
+
+
+        public PluginInfo? GetPluginInfo(string pluginId) =>
+       _pluginContainers.Values
+           .FirstOrDefault(c => string.Equals(
+               c.PluginInfo.SystemID, pluginId, StringComparison.OrdinalIgnoreCase))?.PluginInfo;
+
+
+        public IEnumerable<IPluginContainer> GetAllPlugins()
+            => _pluginContainers.Values;
     }
 }

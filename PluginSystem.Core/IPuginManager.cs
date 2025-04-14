@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace PluginSystem.Core
 {
     using System;
@@ -26,33 +21,33 @@ namespace PluginSystem.Core
             /// <summary>
             /// Загружает все доступные плагины.
             /// </summary>
-            void LoadAllPlugins();
+            IEnumerable<IPluginContainer> LoadAllPlugins();
 
             /// <summary>
             /// Перезагружает плагин.
             /// </summary>
             /// <param name="name">Имя плагина.</param>
             /// <returns>true, если успешно.</returns>
-            bool ReloadPlugin(string name);
+            //bool ReloadPlugin(string name);
 
             /// <summary>
             /// Выгружает плагин по имени.
             /// </summary>
             /// <param name="name">Имя плагина.</param>
             /// <returns>true, если успешно выгружен.</returns>
-            bool UnloadPlugin(string name);
+            ///bool UnloadPlugin(string name);
 
             /// <summary>
             /// Выгружает все загруженные плагины.
             /// </summary>
-            void UnloadAll();
+            //void UnloadAll();
 
             /// <summary>
             /// Проверяет, загружен ли плагин.
             /// </summary>
             /// <param name="name">Имя плагина.</param>
             /// <returns>true, если загружен.</returns>
-            bool IsPluginLoaded(string name);
+            ///bool IsPluginLoaded(string name);
 
             /// <summary>
             /// Получает экземпляр плагина.
@@ -72,13 +67,13 @@ namespace PluginSystem.Core
             /// Получает список всех загруженных плагинов.
             /// </summary>
             /// <returns>Список плагинов.</returns>
-            IEnumerable<IPlugin> GetAllPlugins();
+            IEnumerable<IPluginContainer> GetAllPlugins();
 
             /// <summary>
             /// Регистрирует плагин вручную (в обход автозагрузки).
             /// </summary>
             /// <param name="plugin">Плагин для регистрации.</param>
-            void RegisterPlugin(IPlugin plugin);
+            //void RegisterPlugin(IPlugin plugin);
 
             /// <summary>
             /// Событие, возникающее при успешной загрузке плагина.
