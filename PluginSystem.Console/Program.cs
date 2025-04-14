@@ -1,25 +1,52 @@
 ﻿
+using Microsoft.Extensions.DependencyInjection;
 using PluginSystem.Console;
+using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
+using PluginSystem.Hosting.ConsoleCommands;
 using PluginSystem.Runtime;
+using System;
 
 class Program
 {
-    private static PluginConsoleMenu _pluginConsoleMenu;
-    private static PluginManager _pluginManager;
-
-    static void Main()
+    static void Main(string[] args)
     {
-        var logger = new NLogLoggerService();
-        _pluginManager = new PluginManager(loggerService: logger);
+        var services = new ServiceCollection().AddSingleton<ILoggerService, NLogLoggerService>().BuildServiceProvider();
 
-        if (_pluginManager.LoadPlugin("FileManagerPlugin"))
+        var output = new ConsoleOutput();
+        var dispatcher = new ConsoleCommandDispatcher(services, output);
+
+        // Регистрируем команды
+        dispatcher.Register(new HelpCommand(dispatcher));
+        dispatcher.Register(new ExitCommand());
+
+        while (true)
         {
-            _pluginConsoleMenu = new PluginConsoleMenu(
-                _pluginManager.LoadedPlugins.Values
-                    .OrderBy(p => p.PluginInfo.Name)
-                        .ToList());
+            Console.Write("> ");
+            var line = Console.ReadLine();
+            if (line?.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase) == true)
+                break;
 
-            _pluginConsoleMenu.Run();
+            dispatcher.ExecuteCommand(line ?? "");
         }
     }
 }
+
+    //private static PluginConsoleMenu _pluginConsoleMenu;
+    //private static PluginManager _pluginManager;
+
+    //static void Main()
+    //{
+    //    var logger = new NLogLoggerService();
+    //    _pluginManager = new PluginManager(loggerService: logger);
+
+    //    if (_pluginManager.LoadPlugin("FileManagerPlugin"))
+    //    {
+    //        _pluginConsoleMenu = new PluginConsoleMenu(
+    //            _pluginManager.LoadedPlugins.Values
+    //                .OrderBy(p => p.PluginInfo.Name)
+    //                    .ToList());
+
+    //        _pluginConsoleMenu.Run();
+    //    }
+    //}
