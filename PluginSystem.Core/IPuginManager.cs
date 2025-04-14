@@ -78,12 +78,12 @@ namespace PluginSystem.Core
             /// <summary>
             /// Событие, возникающее при успешной загрузке плагина.
             /// </summary>
-            event Action<IPlugin> PluginLoaded;
+            event Action<IPlugin> OnPluginLoaded;
 
             /// <summary>
             /// Событие, возникающее при выгрузке плагина.
             /// </summary>
-            event Action<IPlugin> PluginUnloaded;
+            event Action<IPlugin> OnPluginUnloaded;
         }
     }
 }

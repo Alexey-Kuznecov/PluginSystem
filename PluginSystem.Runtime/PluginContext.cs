@@ -14,11 +14,6 @@ namespace PluginSystem.Runtime
         public IPluginSettingsService SettingsService { get; }
         private readonly CommandManager _commandManager; // Менеджер команд для undo/redo
 
-        public PluginContext()
-        {
-            _commandManager = new CommandManager(); // Инициализация менеджера команд
-        }
-
         public PluginContext(string path)
         {
             SettingsService = new JsonPluginSettingsService(path);

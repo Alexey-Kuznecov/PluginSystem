@@ -12,7 +12,8 @@ namespace PluginSystem.TestPlugins
             Name = "FaultyPlugin",
             Version = "1.0.0",
             Author = "Test Author",
-            SystemID = PluginHelper.GeneratePluginId(new[] { "CommandFaultyPlugin", "1.0.0" })
+            SystemID = PluginHelper.GeneratePluginId( 
+                new[] { "CommandFaultyPlugin", "1.0.0" }).ToString()
         };
 
         public string Name => throw new NotImplementedException();
@@ -53,7 +54,8 @@ namespace PluginSystem.TestPlugins
             Name = "CommandFaultyPlugin",
             Version = "1.0.0",
             Author = "Test Author",
-            SystemID = PluginHelper.GeneratePluginId(new[] { "CommandFaultyPlugin", "1.0.0" })
+            SystemID = PluginHelper.GeneratePluginId(
+                new[] { "CommandFaultyPlugin", "1.0.0" }).ToString()
         };
 
         public string Name => throw new NotImplementedException();
@@ -69,11 +71,11 @@ namespace PluginSystem.TestPlugins
         {
             Console.WriteLine("CommandFaultyPlugin: Load started");
 
-            // Регистрация команды с ошибкой
-            CommandManager.RegisterCommand("faulty_command", args =>
-            {
-                throw new ArgumentException("Ошибка при выполнении команды.");
-            });
+            //// Регистрация команды с ошибкой
+            //CommandManager.RegisterCommand(command =>
+            //{
+            //    throw new ArgumentException("Ошибка при выполнении команды.");
+            //});
         }
 
         public void Shutdown()
