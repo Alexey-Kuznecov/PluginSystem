@@ -56,15 +56,15 @@ namespace PluginSystem.Runtime
                 return false;
             }
 
-            var plugin = factory.CreatePlugin(); // Создаем экземпляр плагина
-            var info = factory.GetPluginInfo(new PluginInfo()); // Получаем информацию о плагине
-
+            var info = factory.GetPluginInfo(new PluginInfo());
+            info.EnsureSystemId(); // Получаем информацию о плагине
+            
             if (IsPluginAlreadyLoaded(info.SystemID))
             {
                 _logger.Error($"Не удалось загрузить плагин, плагин уже загружен. {pluginPath}");
                 return false;
             }
-
+            var plugin = factory.CreatePlugin(); // Создаем экземпляр плагина
             return RegisterPlugin(info, plugin); // Регистрируем плагин в контейнере
         }
 
@@ -75,8 +75,16 @@ namespace PluginSystem.Runtime
         /// </summary>
         /// <param name="name">Имя плагина.</param>
         /// <returns>Полный путь к DLL-файлу плагина.</returns>
-        private string GetPluginPath(string name) =>
-            Path.Combine(_assemblyPath, name, $"{name}.dll");
+        private string GetPluginPath(string path) 
+        {
+            if (path.TryGetFirstDllFileInfo(out var fileName, out _))
+            {
+                return Path.Combine(path, fileName);
+            }
+
+            return AppContext.BaseDirectory;
+        }
+
 
         /// <summary>
         /// Загружает фабрику плагина из указанного пути.
@@ -131,10 +139,10 @@ namespace PluginSystem.Runtime
 
             foreach (var pluginDir in Directory.EnumerateDirectories(_assemblyPath))
             {
-                var name = Path.GetFileName(pluginDir);
+                // var name = Path.GetFileName(pluginDir);
                 var previousCount = _pluginContainers.Count;
 
-                if (LoadPlugin(name) && _pluginContainers.Count > previousCount)
+                if (LoadPlugin(pluginDir) && _pluginContainers.Count > previousCount)
                 {
                     // Последний добавленный — это и есть наш новый плагин
                     var container = _pluginContainers.Values.Last();

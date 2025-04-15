@@ -2,6 +2,7 @@
 namespace PluginSystem.Runtime
 {
     using PluginSystem.Core;
+    using System.Xml.Linq;
 
     public class PluginFactory : IPluginFactory
     {
@@ -19,6 +20,11 @@ namespace PluginSystem.Runtime
 
         public PluginInfo GetPluginInfo(PluginInfo info)
         {
+            info.Name ??= _pluginType.Name;
+            info.Version ??= "1.0.0";
+            info.Author ??= "Unknown";
+            info.DeveloperID ??= $"{_pluginType.FullName?.ToLowerInvariant()}";
+            info.DocumentationPath ??= _pluginType.Assembly.FullName ?? "Unknown";
             return info;
         }
     }

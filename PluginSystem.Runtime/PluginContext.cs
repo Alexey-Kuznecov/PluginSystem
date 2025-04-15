@@ -112,5 +112,10 @@ namespace PluginSystem.Runtime
         {
             _commandManager.Redo();
         }
+        public PluginContext(string path, CommandManager commandManager)
+        {
+            SettingsService = new JsonPluginSettingsService(path);
+            _commandManager = commandManager ?? throw new ArgumentNullException(nameof(commandManager));
+        }
     }
 }

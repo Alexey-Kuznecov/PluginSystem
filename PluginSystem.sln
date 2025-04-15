@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginSystem.Commands", "PluginSystem.Commands\PluginSystem.Commands.csproj", "{9A71EFED-3B3D-D257-36BC-3FAA5D79E77A}"
 EndProject
@@ -29,6 +29,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClockPlugin", "Plugins\ClockPlugin\ClockPlugin.csproj", "{90BF42BF-D39F-6BDA-89B5-822ED23243A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManagerPlugin", "Plugins\FileManagerPlugin\FileManagerPlugin.csproj", "{48CD90AE-E182-EE11-DED3-C99610FD5282}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoPlugin", "Plugins\EchoPlugin\EchoPlugin.csproj", "{BC912DA5-68FA-41FA-81B5-9F7115490D05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,6 +78,10 @@ Global
 		{48CD90AE-E182-EE11-DED3-C99610FD5282}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48CD90AE-E182-EE11-DED3-C99610FD5282}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48CD90AE-E182-EE11-DED3-C99610FD5282}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +89,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{90BF42BF-D39F-6BDA-89B5-822ED23243A5} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{48CD90AE-E182-EE11-DED3-C99610FD5282} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{BC912DA5-68FA-41FA-81B5-9F7115490D05} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2DA91C4F-F3C2-4CFD-BBD5-F30428A417AA}

@@ -71,6 +71,5 @@ namespace PluginSystem.Runtime
             Plugin?.Shutdown(); // Вызываем завершение работы плагина
             Plugin = null; // Убираем ссылку на плагин
         }
-
     }
 }

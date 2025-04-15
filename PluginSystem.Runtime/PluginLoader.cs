@@ -21,15 +21,22 @@ namespace PluginSystem.Runtime
         {
             if (!File.Exists(path))
                 return null;
+
             try
             {
                 var assembly = LoadAssembly(path);
+
+                // Сначала пробуем найти пользовательскую фабрику
                 var factoryType = FindPluginFactoryType(assembly);
+                if (factoryType != null)
+                    return CreateInstance<IPluginFactory>(factoryType);
 
-                if (factoryType == null)
-                    return null;
+                // Если не нашли, ищем сам плагин
+                var pluginType = FindPluginTypeImplementing<IPlugin>(assembly);
+                if (pluginType != null)
+                    return new PluginFactory(pluginType); // Универсальная фабрика
 
-                return CreateInstance<IPluginFactory>(factoryType);
+                return null;
             }
             catch (Exception ex)
             {
@@ -37,6 +44,7 @@ namespace PluginSystem.Runtime
                 return null;
             }
         }
+
 
         /// <summary>
         /// Загружает все плагины из указанной директории, возвращая фабрики плагинов.
@@ -56,6 +64,13 @@ namespace PluginSystem.Runtime
                 if (factory != null)
                     yield return factory;
             }
+        }
+
+        private Type? FindPluginTypeImplementing<TInterface>(Assembly assembly)
+        {
+            return assembly
+                .GetTypes()
+                .FirstOrDefault(t => typeof(TInterface).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
         }
 
         /// <summary>

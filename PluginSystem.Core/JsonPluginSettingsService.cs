@@ -64,6 +64,9 @@ namespace PluginSystem.Core
         }
 
         private string GetSettingsPath(string pluginName)
-            => Path.Combine(_basePath, pluginName, "settings.json");
+        {
+            var pluginDir = Path.Combine(AppContext.BaseDirectory, "Plugins", pluginName);
+            return Path.Combine(pluginDir, "settings.json");
+        }
     }
 }

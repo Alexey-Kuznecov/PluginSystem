@@ -26,7 +26,7 @@ namespace PluginSystem.Core
         /// Внутренний уникальный системный идентификатор плагина.
         /// Может быть сгенерирован при загрузке плагина.
         /// </summary>
-        public string SystemID { get; init; } = Guid.NewGuid().ToString();
+        public string SystemID { get; set; }
 
         /// <summary>
         /// Человекочитаемый идентификатор плагина, задается вручную.
@@ -48,11 +48,28 @@ namespace PluginSystem.Core
         /// </summary>
         public object? ChangelogUrl { get; set; }
 
+        public PluginInfo(string name, string version = "", string author = "", string? developerId = null)
+        {
+            //Name = name;
+            //Version = version;
+            //Author = author;
+            //DeveloperID = developerId;
+
+            //if (string.IsNullOrWhiteSpace(DeveloperID))
+            //{
+            //    Console.WriteLine($"[Warning] Плагин '{Name}' не указал DeveloperID. Используется авто-ID на основе имени, версии и автора.");
+            //}
+
+            //// Если DeveloperID есть — используем его
+            //var idSeed = !string.IsNullOrWhiteSpace(DeveloperID)
+            //    ? DeveloperID
+            //    : $"{Name}-{Version}-{Author}";
+
+            //SystemID = PluginHelper.GeneratePluginId([idSeed]).ToString();
+        }
+
         public PluginInfo()
         {
-            // Генерация уникального ID с помощью хелпера
-            // Получить описание на нужном языке
-            SystemID = PluginHelper.GeneratePluginId([Name, Version]).ToString();
         }
 
         /// <summary>
