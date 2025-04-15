@@ -18,7 +18,7 @@ namespace PluginSystem.Runtime
                 ? info.DeveloperID
                 : $"{info.Name}-{info.Version}-{info.Author}";
 
-            info.SystemID = PluginHelper.GeneratePluginId([seed]).ToString();
+            info.SystemID = PluginHelper.GenerateReadablePluginId(seed).ToString();
         }
     }
 }

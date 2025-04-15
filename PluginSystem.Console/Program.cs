@@ -28,7 +28,7 @@ class Program
         var autoComplete = new CommandAutoCompleteProvider(dispatcher);
        
         // Регистрируем команды
-        dispatcher.Register(new LoadPluginCommand(output));
+        dispatcher.Register(new LoadPluginCommand(_pluginManager, output));
         dispatcher.Register(new ListPluginsCommand());
         dispatcher.Register(new SuggestCommand(autoComplete));
         dispatcher.Register(new HelpCommand(dispatcher));

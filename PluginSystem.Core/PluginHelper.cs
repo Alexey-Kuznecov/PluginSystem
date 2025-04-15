@@ -1,4 +1,7 @@
 ﻿
+using System.Security.Cryptography;
+using System.Text;
+
 namespace PluginSystem.Core
 {
     public static class PluginHelper
@@ -26,6 +29,18 @@ namespace PluginSystem.Core
             byte[] guidBytes = hash.Take(16).ToArray();
 
             return new Guid(guidBytes);
+        }
+
+        public static string GenerateReadablePluginId(string name, string? version = null)
+        {
+            var baseName = name.Trim().ToLowerInvariant().Replace(" ", "-");
+
+            using var sha1 = SHA1.Create();
+            var input = $"{name}@{version ?? ""}";
+            var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(input));
+            var shortHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant().Substring(0, 10);
+
+            return $"{baseName}-{shortHash}";
         }
 
         // Дополнительные хелпер-методы можно добавить здесь
