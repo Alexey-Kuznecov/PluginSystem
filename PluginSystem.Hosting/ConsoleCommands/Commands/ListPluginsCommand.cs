@@ -1,5 +1,7 @@
 ﻿using PluginSystem.Core.PluginSystem.Core;
 using Microsoft.Extensions.DependencyInjection;
+using PluginSystem.Core;
+using System.Text.Json;
 
 namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
@@ -29,11 +31,32 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
 
             if (json)
             {
-                var jsonText = System.Text.Json.JsonSerializer.Serialize(plugins.Select(p => new
+                var infoService = context.Services.GetService<JsonPluginInfoService>();
+                if (infoService == null)
                 {
-                    p.Plugin.Name,
-                    p.Plugin.Version
-                }), new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                    context.Output.WriteError("Сервис JsonPluginInfoService не найден.");
+                    return;
+                }
+
+                var pluginInfos = new List<PluginInfo>();
+
+                foreach (var container in plugins)
+                {
+                    try
+                    {
+                        pluginInfos.Add(container.PluginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        context.Output.WriteError($"Ошибка при получении информации о плагине '{container.Plugin.Name}': {ex.Message}");
+                    }
+                }
+
+                var jsonText = JsonSerializer.Serialize(pluginInfos, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
 
                 context.Output.WriteLine(jsonText);
                 return;
