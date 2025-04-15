@@ -13,20 +13,20 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
     public class LoadPluginCommand : IConsoleCommand
     {
-        private readonly IPluginManager _pluginManager;
+        private IPluginManager _pluginManager;
         private readonly IConsoleOutput _output;
 
         public string Name => "load";
         public string Description => "Загружает плагин из указанного пути или загружает все плагины с ключом --all.";
 
-        public LoadPluginCommand(IPluginManager pluginManager, IConsoleOutput output)
+        public LoadPluginCommand(IConsoleOutput output)
         {
-            _pluginManager = pluginManager;
             _output = output;
         }
 
         public void Execute(CommandContext context)
         {
+            _pluginManager = context.Services.GetService<IPluginManager>();
             var args = context.Arguments;
             if (args.Contains("--all", StringComparer.OrdinalIgnoreCase))
             {

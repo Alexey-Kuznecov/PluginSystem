@@ -10,7 +10,7 @@ namespace FileManagerPlugin
         public string Id => "FileManagerPlugin";
         public string Name => "File Manager Plugin";
 
-        public string Version => throw new NotImplementedException();
+        public string Version => "1.0";
 
         public void Initialize(IPluginContext context)
         {

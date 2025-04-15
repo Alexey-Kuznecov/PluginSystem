@@ -41,18 +41,22 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
 
             foreach (var container in plugins)
             {
-                if (verbose)
+                try
                 {
-                    context.Output.WriteLine($"Плагин: {container.Plugin.Name} Версия: {container.Plugin.Version} ID: {container.PluginInfo.SystemID}");
+                    var name = container.Plugin.Name;
+                    var version = container.Plugin.Version;
+                    var id = container.PluginInfo.SystemID;
+
+                    if (verbose)
+                        context.Output.WriteLine($"Плагин: {name} Версия: {version} ID: {id}");
+                    else
+                        context.Output.WriteLine($"{name} ({version})");
                 }
-                else
+                catch (Exception ex)
                 {
-                    context.Output.WriteLine($"{container.Plugin.Name} ({container.Plugin.Version})");
+                    context.Output.WriteError($"Ошибка при выводе информации о плагине: {ex.Message}");
                 }
             }
-
-            foreach (var container in plugins)
-                context.Output.WriteLine($"{container.Plugin.Name} ({container.Plugin.Version})");
         }
 
         public IEnumerable<string> GetSuggestions(string[] args)
