@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace PluginSystem.Hosting.ConsoleCommands
 {
     public interface IConsoleCommandDispatcher
-    {
+    {   
         void Register(IConsoleCommand command);
         bool ExecuteCommand(string commandLine);
         IEnumerable<IConsoleCommand> GetAvailableCommands();

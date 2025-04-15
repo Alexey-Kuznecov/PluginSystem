@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PluginSystem.Hosting.ConsoleCommands
+namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
     public class HelpCommand : IConsoleCommand
     {
@@ -51,6 +51,11 @@ namespace PluginSystem.Hosting.ConsoleCommands
                     context.Output.WriteError($"Команда \"{name}\" не найдена.");
                 }
             }
+        }
+
+        public IEnumerable<string> GetSuggestions(string[] args)
+        {
+            throw new NotImplementedException();
         }
     }
 }

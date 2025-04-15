@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PluginSystem.Hosting.ConsoleCommands
+namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
     public class ExitCommand : IConsoleCommand
     {
@@ -15,6 +15,11 @@ namespace PluginSystem.Hosting.ConsoleCommands
         {
             Console.WriteLine("Выход...");
             Environment.Exit(0);
+        }
+
+        public IEnumerable<string> GetSuggestions(string[] args)
+        {
+            throw new NotImplementedException();
         }
     }
 }
