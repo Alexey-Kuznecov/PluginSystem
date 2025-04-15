@@ -17,10 +17,11 @@ namespace PluginSystem.Runtime
         private readonly PluginLoader _loader = new(); // Загрузчик плагинов
         private readonly ILoggerService _logger = new NLogLoggerService(); // Логгер
         private readonly string _assemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+        private readonly PluginPersistenceService _persistenceService;
 
         #endregion
 
-        #region Свойства
+        #region Свойства и события
 
         /// <summary>
         /// Коллекция загруженных плагинов, индексированных по их уникальному идентификатору.
@@ -32,14 +33,21 @@ namespace PluginSystem.Runtime
 
         #endregion
 
+        #region Зависимости и инициализация
+
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="PluginManager"/> с указанным сервисом логирования.
         /// </summary>
         /// <param name="loggerService">Сервис логирования для записи сообщений.</param>
-        public PluginManager(ILoggerService loggerService)
+        public PluginManager(PluginPersistenceService persistenceService, ILoggerService loggerService)
         {
+            _persistenceService = persistenceService;
             _logger = loggerService;
+
+            // Инициализация остальных зависимостей
         }
+
+        #endregion
 
         /// <summary>
         /// Загружает плагин по его имени.
@@ -61,10 +69,11 @@ namespace PluginSystem.Runtime
             
             if (IsPluginAlreadyLoaded(info.SystemID))
             {
-                _logger.Error($"Не удалось загрузить плагин, плагин уже загружен. {pluginPath}");
+                _logger.Error($"Не удалось загрузить плагин [{info.Name}], плагин уже загружен. {pluginPath}");
                 return false;
             }
             var plugin = factory.CreatePlugin(); // Создаем экземпляр плагина
+            _logger.Info($"Плагин [{info.Name}] загружен и зарегистрирован.");
             return RegisterPlugin(info, plugin); // Регистрируем плагин в контейнере
         }
 
@@ -135,6 +144,7 @@ namespace PluginSystem.Runtime
         // Загружает все плагины и возвращает коллекцию их контейнеров
         public IEnumerable<IPluginContainer> LoadAllPlugins()
         {
+            _logger.Info($"Начало загрузки плагинов..");
             var newlyLoaded = new List<IPluginContainer>();
 
             foreach (var pluginDir in Directory.EnumerateDirectories(_assemblyPath))
@@ -174,5 +184,20 @@ namespace PluginSystem.Runtime
 
         public IEnumerable<IPluginContainer> GetAllPlugins()
             => _pluginContainers.Values;
+
+        public void SavePluginInfo(PluginInfo info)
+        {
+            _persistenceService.Save(info);
+        }
+
+        public PluginInfo? LoadPluginInfo(string systemId)
+        {
+            return _persistenceService.Load(systemId);
+        }
+
+        public bool PluginInfoExists(string systemId)
+        {
+            return _persistenceService.Exists(systemId);
+        }
     }
 }

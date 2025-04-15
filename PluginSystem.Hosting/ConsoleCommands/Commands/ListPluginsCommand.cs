@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PluginSystem.Core;
 using System.Text.Json;
+using PluginSystem.Runtime;
 
 namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
@@ -31,7 +32,7 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
 
             if (json)
             {
-                var infoService = context.Services.GetService<JsonPluginInfoService>();
+                var infoService = context.Services.GetService<PluginPersistenceService>();
                 if (infoService == null)
                 {
                     context.Output.WriteError("Сервис JsonPluginInfoService не найден.");

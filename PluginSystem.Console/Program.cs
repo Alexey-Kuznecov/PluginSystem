@@ -15,13 +15,13 @@ class Program
 
     static void Main(string[] args)
     {
-
+        
         var logger = new NLogLoggerService();
-        _pluginManager = new PluginManager(logger);
+        var persistenceService = new PluginPersistenceService();
         var services = new ServiceCollection().AddSingleton<ILoggerService, NLogLoggerService>();
         services.AddSingleton<IPluginManager, PluginManager>();
-        services.AddSingleton<JsonPluginInfoService>();
         var provider = services.BuildServiceProvider();
+        _pluginManager = new PluginManager(persistenceService, logger);
         var output = new ConsoleOutput();
         var dispatcher = new ConsoleCommandDispatcher(provider, output);
         var autoComplete = new CommandAutoCompleteProvider(dispatcher);
