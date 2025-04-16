@@ -59,7 +59,18 @@ namespace PluginSystem.Commands
 
             public ILogger Logger => throw new NotImplementedException();
 
+            public string PluginId => throw new NotImplementedException();
+
+            public IPluginSettingsService Settings => throw new NotImplementedException();
+
+            public string PluginDirectory => throw new NotImplementedException();
+
             public void Cleanup()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(string pluginId)
             {
                 throw new NotImplementedException();
             }
@@ -75,6 +86,11 @@ namespace PluginSystem.Commands
             }
 
             public IEnumerable<T> GetServices<T>() where T : class
+            {
+                throw new NotImplementedException();
+            }
+
+            public T Load<T>(string pluginId) where T : class, new()
             {
                 throw new NotImplementedException();
             }
@@ -95,6 +111,11 @@ namespace PluginSystem.Commands
             }
 
             public void RegisterSetting(object setting)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Save<T>(string pluginId, T settings) where T : class
             {
                 throw new NotImplementedException();
             }

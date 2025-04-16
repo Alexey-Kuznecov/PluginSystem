@@ -3,10 +3,11 @@ using PluginSystem.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace FileManagerPlugin.Commands;
 
-public class CopyFileCommand : IPluginCommand
+public class CopyFileCommand : IPluginCommand, IPluginUnloadable
 {
     public string Id => "CopyFile";
     public string Name => "Copy File";
@@ -32,5 +33,10 @@ public class CopyFileCommand : IPluginCommand
 
         File.Copy(source, destination, overwrite: true);
         Console.WriteLine($"File copied from {source} to {destination}");
+    }
+
+    public void OnUnload()
+    {
+        throw new NotImplementedException();
     }
 }

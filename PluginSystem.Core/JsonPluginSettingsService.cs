@@ -10,9 +10,9 @@ namespace PluginSystem.Core
         private readonly string _basePath;
         private readonly JsonSerializerOptions _options;
 
-        public JsonPluginSettingsService(string? basePath = null)
+        public JsonPluginSettingsService(string? pluginDirectory = null)
         {
-            _basePath = basePath ?? Path.Combine(AppContext.BaseDirectory, "Plugins", "");
+            _basePath = pluginDirectory;
             _options = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -22,7 +22,7 @@ namespace PluginSystem.Core
 
         public T Load<T>(string pluginName) where T : new()
         {
-            var path = GetSettingsPath(pluginName);
+            var path = GetSettingsPath();
 
             try
             {
@@ -44,7 +44,7 @@ namespace PluginSystem.Core
 
         public void Save<T>(string pluginName, T settings)
         {
-            var path = GetSettingsPath(pluginName);
+            var path = GetSettingsPath();
             var dir = Path.GetDirectoryName(path);
 
             try
@@ -63,15 +63,11 @@ namespace PluginSystem.Core
             }
         }
 
-        private string GetSettingsPath(string pluginName)
-        {
-            var pluginDir = Path.Combine(AppContext.BaseDirectory, "Plugins", pluginName);
-            return Path.Combine(pluginDir, "settings.json");
-        }
+        private string GetSettingsPath() => Path.Combine(_basePath, "settings.json");
 
         public void Delete(string pluginName)
         {
-            var path = GetSettingsPath(pluginName);
+            var path = GetSettingsPath();
             try
             {
                 var dir = Path.GetDirectoryName(path);

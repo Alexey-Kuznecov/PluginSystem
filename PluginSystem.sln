@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManagerPlugin", "Plugin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoPlugin", "Plugins\EchoPlugin\EchoPlugin.csproj", "{BC912DA5-68FA-41FA-81B5-9F7115490D05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoFileManagerPlugin", "Plugins\DemoFileManagerPlugin\DemoFileManagerPlugin.csproj", "{D54962BA-607C-4AA3-B738-44FEF7BA88B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC912DA5-68FA-41FA-81B5-9F7115490D05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D54962BA-607C-4AA3-B738-44FEF7BA88B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D54962BA-607C-4AA3-B738-44FEF7BA88B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D54962BA-607C-4AA3-B738-44FEF7BA88B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D54962BA-607C-4AA3-B738-44FEF7BA88B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +97,7 @@ Global
 		{90BF42BF-D39F-6BDA-89B5-822ED23243A5} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{48CD90AE-E182-EE11-DED3-C99610FD5282} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{BC912DA5-68FA-41FA-81B5-9F7115490D05} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{D54962BA-607C-4AA3-B738-44FEF7BA88B9} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2DA91C4F-F3C2-4CFD-BBD5-F30428A417AA}
