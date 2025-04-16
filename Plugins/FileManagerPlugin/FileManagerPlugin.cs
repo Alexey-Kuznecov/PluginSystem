@@ -14,7 +14,7 @@ namespace FileManagerPlugin
 
         public void Initialize(IPluginContext context)
         {
-            context.Register(new CopyFileCommand());
+            //context.Register(new CopyFileCommand());
             //context.RegisterCommand(new MoveFileCommand());
             //context.RegisterCommand(new DeleteFileCommand());
             //context.RegisterCommand(new CreateDirectoryCommand());
@@ -44,7 +44,7 @@ namespace FileManagerPlugin
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
     }
 }

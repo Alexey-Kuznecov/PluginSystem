@@ -33,9 +33,9 @@ namespace PluginSystem.Core
             /// <summary>
             /// Выгружает плагин по имени.
             /// </summary>
-            /// <param name="name">Имя плагина.</param>
+            /// <param name = "name" > Имя плагина.</param>
             /// <returns>true, если успешно выгружен.</returns>
-            ///bool UnloadPlugin(string name);
+            bool UnloadPlugin(string name);
 
             /// <summary>
             /// Выгружает все загруженные плагины.

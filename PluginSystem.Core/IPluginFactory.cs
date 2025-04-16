@@ -1,10 +1,11 @@
 ﻿
+using PluginSystem.Core.PluginSystem.Core;
+
 namespace PluginSystem.Core
 {
     public interface IPluginFactory
     {
-        IPlugin CreatePlugin();
-
-        PluginInfo GetPluginInfo(PluginInfo info); // Новый метод для получения инфорации о плагине
+        IPlugin CreatePlugin(IPluginInitContext container);
+        PluginInfo GetPluginInfo(PluginInfo info);
     }
 }

@@ -48,30 +48,6 @@ namespace PluginSystem.Core
         /// </summary>
         public object? ChangelogUrl { get; set; }
 
-        public PluginInfo(string name, string version = "", string author = "", string? developerId = null)
-        {
-            //Name = name;
-            //Version = version;
-            //Author = author;
-            //DeveloperID = developerId;
-
-            //if (string.IsNullOrWhiteSpace(DeveloperID))
-            //{
-            //    Console.WriteLine($"[Warning] Плагин '{Name}' не указал DeveloperID. Используется авто-ID на основе имени, версии и автора.");
-            //}
-
-            //// Если DeveloperID есть — используем его
-            //var idSeed = !string.IsNullOrWhiteSpace(DeveloperID)
-            //    ? DeveloperID
-            //    : $"{Name}-{Version}-{Author}";
-
-            //SystemID = PluginHelper.GeneratePluginId([idSeed]).ToString();
-        }
-
-        public PluginInfo()
-        {
-        }
-
         /// <summary>
         /// Возвращает локализованное описание плагина.
         /// </summary>

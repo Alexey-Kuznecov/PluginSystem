@@ -1,27 +1,26 @@
-﻿
-using PluginSystem.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PluginSystem.Core;
 
-namespace FileManagerPlugin
+namespace EchoPlugin
 {
-    internal class FileManagerFactory : IPluginFactory
+    public class EchoFactory : IPluginFactory
     {
         public IPlugin CreatePlugin(IPluginInitContext container)
         {
-            return new FileManagerPlugin();
+            return new EchoPlugin();
         }
 
         public PluginInfo GetPluginInfo(PluginInfo info)
         {
-            info.Name = "FileManagerPlugin";
+            info.Name = "EchoPlugin";
             info.Version = "1.0.0";
             info.Author = "UnityCommander Team";
-            info.DeveloperID = "filemanagerplugin-1.0.0";
-            info.DocumentationPath = "FileManagerPlugin";
+            info.DeveloperID = "echoplugin-1.0.0";
+            info.DocumentationPath = "EchoPlugin";
             return info;
         }
     }

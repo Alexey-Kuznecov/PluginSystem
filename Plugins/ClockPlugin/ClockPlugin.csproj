@@ -8,10 +8,9 @@
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(SolutionDir)PluginSystem.Console\bin\Debug\net8.0\Plugins\ClockPlugin\&quot; /Y /I /E" />
-  </Target>
-
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(SolutionDir)PluginSystem.Console\bin\Debug\net8.0\Plugins\ClockPlugin\&quot; /Y /I /E" />
+	</Target>
   <ItemGroup>
     <ProjectReference Include="..\..\PluginSystem.Hosting\PluginSystem.Hosting.csproj" />
   </ItemGroup>

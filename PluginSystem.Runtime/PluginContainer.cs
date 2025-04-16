@@ -1,75 +1,93 @@
 ﻿
+using NLog.Config;
 using PluginSystem.Core;
 using PluginSystem.Core.PluginSystem.Core;
+using PluginSystem.Core.Utilities;
+using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Xml.Linq;
 
 namespace PluginSystem.Runtime
 {
-    /// <summary>
-    /// Контейнер для хранения и управления плагином.
-    /// </summary>
-    public class PluginContainer : IPluginContainer
+    public class PluginContainer : IPluginContainer, IDisposable
     {
-        public PluginInfo PluginInfo { get; private set; } // Информация о плагине
-        public string? Name { get; private set; } // Имя контейнера (категория)
-        public Type PluginType { get; private set; } // Тип плагина
-        public IPluginContext Context { get; private set; } // Контекст плагина
-        public IPlugin Plugin { get; private set; } // Сам плагин
-        private CommandManager CommandManager { get; set; } // Экземпляр CommandManager
+        public string AssemblyPath { get; set; } // Путь к DLL-файлу плагина
+        public IPluginLoadContext? LoadContext { get; set; } // Контекст загрузки плагина
+        public Assembly? LoadedAssembly { get;  set; } // Загруженная сборка плагина
+        public IPluginFactory Factory { get;  set; } // Фабрика плагина
+        public PluginInfo PluginInfo { get;  set; } // Информация о плагине, включая имя, версию и т.д.
+        public string? Name => PluginInfo.Name; // Имя плагина
+        public Type PluginType { get;  set; } // Тип плагина
+        public IPluginContext Context { get; set; } // Контекст плагина
+        public IPlugin Plugin { get; set; } // Сам плагин
 
-        public PluginContainer(PluginInfo info, IPlugin plugin)
+        public CommandManager CommandManager { get; } = new();
+        public PluginContainer(
+            string pluginPath,
+            Assembly assembly,
+            IPluginLoadContext loadContext,
+            IPluginFactory factory,
+            IPlugin plugin,
+            IPluginContext context,
+            PluginInfo pluginInfo)
         {
-            var context = new PluginContext(plugin.GetType().Assembly.Location);
-            CommandManager = new CommandManager(); // Инициализация экземпляра CommandManager
-            PluginInfo = info;
-            Name = info.Name; // Используем имя из метаданных плагина
-            PluginType = plugin.GetType();
-            Context = context; // Инициализируем контекст (или получаем из внешнего источника)
-            Plugin = plugin; // Сохраняем плагин
-            plugin.Initialize(context); // Инициализация плагина
+            AssemblyPath = pluginPath;
+            LoadedAssembly = assembly;
+            LoadContext = loadContext;
+            Factory = factory;
+            Plugin = plugin;
+            Context = context;
+            PluginInfo = pluginInfo;
+            PluginType = Plugin.GetType();
+
+            RegisterPluginCommands();
         }
+
+        private void RegisterPluginCommands()
+        {
+            if (Plugin is not ICommandProvider provider)
+                return;
+
+            foreach (var command in provider.GetCommands())
+            {
+                CommandManager.RegisterCommand(command);
+            }
+        }
+
+        public IPluginContext GetContext(IPlugin plugin) => Context;
+
+        public IPlugin? GetPlugin(string name) =>
+            PluginInfo.Name == name ? Plugin : null;
 
         public List<IPluginCommand> GetCommands()
         {
-            var commands = new List<IPluginCommand>();
-
-            // Проверяем, реализует ли плагин интерфейс ICommandProvider
             if (Plugin is ICommandProvider provider)
-            {
-                commands = provider.GetCommands().ToList();
+                return provider.GetCommands().ToList();
 
-                // Регистрируем все команды в CommandManager
-                foreach (var command in commands)
-                {
-                    // Преобразуем IPluginContext в ICommandContext, если это необходимо
-                    if (Context is ICommandContext commandContext)
-                    {
-                        CommandManager.RegisterCommand(command);
-
-                        // Вызываем ExecuteCommand в контексте плагина
-                        Context.ExecuteCommand(command, commandContext);
-                    }
-                    else
-                    {
-                        // Логирование ошибки или обработка случая, если Context не является ICommandContext
-                        Console.WriteLine("Context не является ICommandContext.");
-                    }
-                }
-            }
-
-            return commands;
+            return new List<IPluginCommand>();
         }
-
-        public IPluginContext GetContext(IPlugin plugin) => Context; // Возвращаем контекст плагина
-
-        public IPlugin? GetPlugin(string name) => Plugin; // Возвращаем текущий плагин
-
-        /// <summary>
-        /// Очищает контейнер, удаляя плагин.
-        /// </summary>
         public void Clear()
         {
-            Plugin?.Shutdown(); // Вызываем завершение работы плагина
-            Plugin = null; // Убираем ссылку на плагин
+            Plugin?.Shutdown();
+        }
+
+        public void Unload()
+        {
+            //Context = null;
+            //PluginType = null;
+            //Factory = null;
+            //PluginInfo = null;
+            //LoadedAssembly = null;
+            Plugin?.Shutdown();
+            LoadContext?.Unload();
+            //Plugin = null;
+        }
+
+        public void Dispose()
+        {
+            (LoadContext as IDisposable)?.Dispose();
+            Plugin?.Shutdown();
         }
     }
 }

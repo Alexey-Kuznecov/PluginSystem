@@ -1,5 +1,6 @@
 ﻿
 using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace ClockPlugin
 {
     internal class ClockFactory : IPluginFactory
     {
-        public IPlugin CreatePlugin()
+        public IPlugin CreatePlugin(IPluginInitContext context)
         {
             return new ClockPlugin();
         }

@@ -2,6 +2,7 @@
 namespace PluginSystem.Runtime
 {
     using PluginSystem.Core;
+    using PluginSystem.Core.PluginSystem.Core;
     using System.Xml.Linq;
 
     public class PluginFactory : IPluginFactory
@@ -13,9 +14,11 @@ namespace PluginSystem.Runtime
             _pluginType = pluginType;
         }
 
-        public IPlugin CreatePlugin()
+        public IPlugin CreatePlugin(IPluginInitContext context)
         {
-            return (IPlugin)Activator.CreateInstance(_pluginType)!;
+            var plugin = (IPlugin)Activator.CreateInstance(_pluginType)!;
+            plugin.Initialize(context.Services);
+            return plugin;
         }
 
         public PluginInfo GetPluginInfo(PluginInfo info)
@@ -23,7 +26,7 @@ namespace PluginSystem.Runtime
             info.Name ??= _pluginType.Name;
             info.Version ??= "1.0.0";
             info.Author ??= "Unknown";
-            info.DeveloperID ??= $"{_pluginType.FullName?.ToLowerInvariant()}";
+            info.DeveloperID ??= _pluginType.FullName?.ToLowerInvariant();
             info.DocumentationPath ??= _pluginType.Assembly.FullName ?? "Unknown";
             return info;
         }

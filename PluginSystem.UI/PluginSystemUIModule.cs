@@ -17,8 +17,8 @@ namespace PluginSystem.UI
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterForNavigation<PluginListView, PluginListViewModel>();
-            containerRegistry.RegisterForNavigation<PluginDetailsView, PluginDetailsViewModel>();
+            //containerRegistry.RegisterForNavigation<PluginListView, PluginListViewModel>();
+            //containerRegistry.RegisterForNavigation<PluginDetailsView, PluginDetailsViewModel>();
         }
     }
 }

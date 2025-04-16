@@ -15,20 +15,20 @@ class Program
 
     static void Main(string[] args)
     {
-        
+        var output = new ConsoleOutput();
         var logger = new NLogLoggerService();
-        var persistenceService = new PluginPersistenceService();
-        var services = new ServiceCollection().AddSingleton<ILoggerService, NLogLoggerService>();
+        var services = new ServiceCollection();
+        services.AddSingleton<PluginPersistenceService>();
+        services.AddSingleton<ILoggerService, NLogLoggerService>();
         services.AddSingleton<IPluginManager, PluginManager>();
         var provider = services.BuildServiceProvider();
-        _pluginManager = new PluginManager(persistenceService, logger);
-        var output = new ConsoleOutput();
         var dispatcher = new ConsoleCommandDispatcher(provider, output);
         var autoComplete = new CommandAutoCompleteProvider(dispatcher);
 
         // Регистрируем команды
         dispatcher.Register(new LoadPluginCommand(output));
         dispatcher.Register(new ListPluginsCommand());
+        dispatcher.Register(new UnloadPluginCommand());
         dispatcher.Register(new SuggestCommand(autoComplete));
         dispatcher.Register(new HelpCommand(dispatcher));
         dispatcher.Register(new ExitCommand());

@@ -2,6 +2,7 @@
 namespace PluginSystem.Runtime
 {
     using PluginSystem.Core;
+    using PluginSystem.Core.PluginSystem.Core;
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
@@ -12,39 +13,38 @@ namespace PluginSystem.Runtime
     /// </summary>
     public class PluginLoader : IPluginLoader
     {
-        /// <summary>
-        /// Загружает плагин из указанного пути к DLL-файлу.
-        /// </summary>
-        /// <param name="path">Полный путь к DLL-файлу плагина.</param>
-        /// <returns>Экземпляр <see cref="IPluginFactory"/>, если загрузка успешна; в противном случае — <c>null</c>.</returns>
-        public IPluginFactory? LoadPlugin(string path)
+
+        public IPluginContainer LoadPlugin(string path)
         {
-            if (!File.Exists(path))
-                return null;
+            var loadContext = new PluginLoadContext(path);
+            var assembly = loadContext.LoadFromAssemblyPath(path);
 
-            try
-            {
-                var assembly = LoadAssembly(path);
+            // Поиск и создание фабрики
+            var factoryType = assembly.GetTypes().First(t => typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract);
+            var factory = (IPluginFactory)Activator.CreateInstance(factoryType)!;
 
-                // Сначала пробуем найти пользовательскую фабрику
-                var factoryType = FindPluginFactoryType(assembly);
-                if (factoryType != null)
-                    return CreateInstance<IPluginFactory>(factoryType);
+            // Создаем контексты
+            var pluginInitContext = new PluginInitContext(path, factory.GetPluginInfo(new PluginInfo())); // временный init-контекст, куда фабрика регистрирует зависимости
+            var plugin = factory.CreatePlugin(pluginInitContext);
 
-                // Если не нашли, ищем сам плагин
-                var pluginType = FindPluginTypeImplementing<IPlugin>(assembly);
-                if (pluginType != null)
-                    return new PluginFactory(pluginType); // Универсальная фабрика
+            // Основной runtime-контекст, который передаётся в сам плагин
+            var pluginContext = new PluginContext(path); // например, в PluginContext можно передать всё, что зарегистрировано в InitContext
+            plugin.Initialize(pluginContext);
 
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Ошибка загрузки плагина из '{path}': {ex.Message}");
-                return null;
-            }
+            // Получаем информацию о плагине
+            var pluginInfo = factory.GetPluginInfo(new PluginInfo());
+            var finalContext = pluginInitContext.BuildPluginContext();
+
+            return new PluginContainer(
+                path,
+                assembly,
+                loadContext,
+                factory,
+                plugin,
+                pluginContext,
+                pluginInfo
+            );
         }
-
 
         /// <summary>
         /// Загружает все плагины из указанной директории, возвращая фабрики плагинов.
@@ -53,16 +53,16 @@ namespace PluginSystem.Runtime
         /// <returns>
         /// Перечисление экземпляров <see cref="IPluginFactory"/>, созданных из найденных DLL-файлов.
         /// </returns>
-        public IEnumerable<IPluginFactory> LoadAllPlugins(string path)
+        public IEnumerable<IPluginContainer> LoadAllPlugins(string path)
         {
             if (!Directory.Exists(path))
                 yield break;
 
-            foreach (var plugin in Directory.EnumerateFiles(path, "*.dll"))
+            foreach (var pathplugin in Directory.EnumerateFiles(path, "*.dll"))
             {
-                IPluginFactory? factory = LoadPlugin(plugin);
-                if (factory != null)
-                    yield return factory;
+                IPluginContainer? container = LoadPlugin(path);
+                if (container != null)
+                    yield return container;
             }
         }
 
@@ -115,9 +115,9 @@ namespace PluginSystem.Runtime
             throw new NotImplementedException();
         }
 
-        public void UnloadPlugin(IPlugin plugin)
+        public bool UnloadPlugin(string systemId)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public PluginInfo? GetMetadata(string path)
@@ -143,6 +143,11 @@ namespace PluginSystem.Runtime
             {
                 return null;
             }
+        }
+
+        public bool UnloadPlugin(IPlugin plugin)
+        {
+            throw new NotImplementedException();
         }
     }
 }

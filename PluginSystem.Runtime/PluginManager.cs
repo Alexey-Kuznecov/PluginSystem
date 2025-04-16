@@ -1,10 +1,14 @@
-﻿
+﻿#define DEBUG 
+
 namespace PluginSystem.Runtime
 {
+    using NLog.Config;
     using PluginSystem.Core;
     using PluginSystem.Core.PluginSystem.Core;
+    using PluginSystem.Core.Utilities;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Xml.Linq;
 
     /// <summary>
     /// Менеджер плагинов, отвечающий за загрузку, выгрузку и управление плагинами.
@@ -13,7 +17,7 @@ namespace PluginSystem.Runtime
     {
         #region Поля
 
-        private readonly Dictionary<string, IPluginContainer> _pluginContainers = new(); // Контейнеры плагинов
+        private readonly Dictionary<string, IPluginContainer> _loadedPlugins = new(); // Контейнеры плагинов
         private readonly PluginLoader _loader = new(); // Загрузчик плагинов
         private readonly ILoggerService _logger = new NLogLoggerService(); // Логгер
         private readonly string _assemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
@@ -26,7 +30,7 @@ namespace PluginSystem.Runtime
         /// <summary>
         /// Коллекция загруженных плагинов, индексированных по их уникальному идентификатору.
         /// </summary>
-        public Dictionary<string, IPluginContainer> PluginContainers => _pluginContainers;
+        public Dictionary<string, IPluginContainer> PluginContainers => _loadedPlugins;
 
         public event Action<IPlugin> OnPluginLoaded = delegate { };
         public event Action<IPlugin> OnPluginUnloaded = delegate { };
@@ -57,14 +61,14 @@ namespace PluginSystem.Runtime
         public bool LoadPlugin(string name)
         {
             var pluginPath = GetPluginPath(name); // Получаем путь к плагину
-            var factory = LoadPluginFactory(pluginPath); // Загружаем фабрику плагина
-            if (factory == null)
+            var container = LoadPluginFactory(pluginPath); // Загружаем фабрику плагина
+            if (container == null)
             {
                 _logger.Error($"Не удалось загрузить фабрику плагина из {pluginPath}");
                 return false;
             }
 
-            var info = factory.GetPluginInfo(new PluginInfo());
+            var info = container.PluginInfo;
             info.EnsureSystemId(); // Получаем информацию о плагине
             
             if (IsPluginAlreadyLoaded(info.SystemID))
@@ -72,9 +76,12 @@ namespace PluginSystem.Runtime
                 _logger.Error($"Не удалось загрузить плагин [{info.Name}], плагин уже загружен. {pluginPath}");
                 return false;
             }
-            var plugin = factory.CreatePlugin(); // Создаем экземпляр плагина
+            // Создаем экземпляр плагина и регистрируем его в контейнере
+            // Создаем экземпляр плагина
+            PluginContainers.Add(info.SystemID, container);
+            OnPluginLoaded?.Invoke(container.Plugin); // вызов события
             _logger.Info($"Плагин [{info.Name}] загружен и зарегистрирован.");
-            return RegisterPlugin(info, plugin); // Регистрируем плагин в контейнере
+            return true;
         }
 
         #region Вспомогательные методы
@@ -100,7 +107,7 @@ namespace PluginSystem.Runtime
         /// </summary>
         /// <param name="path">Путь к DLL-файлу плагина.</param>
         /// <returns>Экземпляр фабрики плагина или <c>null</c>, если загрузка не удалась.</returns>
-        private IPluginFactory? LoadPluginFactory(string path) =>
+        private IPluginContainer? LoadPluginFactory(string path) =>
             _loader.LoadPlugin(path);
 
         /// <summary>
@@ -110,20 +117,6 @@ namespace PluginSystem.Runtime
         /// <returns><c>true</c>, если плагин уже загружен; в противном случае — <c>false</c>.</returns>
         private bool IsPluginAlreadyLoaded(string systemId) =>
             PluginContainers.ContainsKey(systemId);
-
-        /// <summary>
-        /// Регистрирует плагин в контейнере загруженных плагинов.
-        /// </summary>
-        /// <param name="info">Информация о плагине.</param>
-        /// <param name="plugin">Экземпляр плагина.</param>
-        /// <returns><c>true</c>, если регистрация прошла успешно; в противном случае — <c>false</c>.</returns>
-        private bool RegisterPlugin(PluginInfo info, IPlugin plugin)
-        {
-            var container = new PluginContainer(info, plugin);
-            PluginContainers.Add(info.SystemID, container);
-            OnPluginLoaded?.Invoke(plugin); // вызов события
-            return true;
-        }
 
         #endregion
 
@@ -135,10 +128,36 @@ namespace PluginSystem.Runtime
             foreach (var container in PluginContainers.Values)
             {
                 OnPluginUnloaded?.Invoke(container.Plugin); // уведомляем о выгрузке
-                container.Clear();
             }
             PluginContainers.Clear();
             _logger.Info("Все плагины выгружены.");
+        }
+
+        public bool UnloadPlugin(string systemId)
+        {
+            if (!_loadedPlugins.TryGetValue(systemId, out var container))
+                return false;
+
+            _loadedPlugins.Remove(systemId);
+
+            // Вызываем Dispose, если нужно
+            var disposable = container.Plugin as IDisposable;
+            if (disposable != null)
+                disposable.Dispose();
+            
+            container.Unload(); // выгружаем плагин
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+#if DEBUG
+            if (container?.LoadContext != null) 
+                PluginUnloadDebugger.MonitorUnload(container?.LoadContext, systemId);
+            var types = container?.LoadedAssembly?.GetTypes();
+#endif
+            // Проверяем, что все типы выгружены
+            container = null;
+            return true;
         }
 
         // Загружает все плагины и возвращает коллекцию их контейнеров
@@ -150,12 +169,12 @@ namespace PluginSystem.Runtime
             foreach (var pluginDir in Directory.EnumerateDirectories(_assemblyPath))
             {
                 // var name = Path.GetFileName(pluginDir);
-                var previousCount = _pluginContainers.Count;
+                var previousCount = _loadedPlugins.Count;
 
-                if (LoadPlugin(pluginDir) && _pluginContainers.Count > previousCount)
+                if (LoadPlugin(pluginDir) && _loadedPlugins.Count > previousCount)
                 {
                     // Последний добавленный — это и есть наш новый плагин
-                    var container = _pluginContainers.Values.Last();
+                    var container = _loadedPlugins.Values.Last();
                     newlyLoaded.Add(container);
                 }
             }
@@ -165,25 +184,25 @@ namespace PluginSystem.Runtime
 
 
         public IPlugin? GetPlugin(string pluginId) =>
-            _pluginContainers.Values
+            _loadedPlugins.Values
                 .FirstOrDefault(c => string.Equals(
                     c.PluginInfo.SystemID, pluginId, StringComparison.OrdinalIgnoreCase))?.Plugin;
 
 
         // Получение плагина по ID
         public IPluginContainer? GetContainerById(string pluginId) =>
-        _pluginContainers.TryGetValue(
+        _loadedPlugins.TryGetValue(
             pluginId, out var container) ? container : null;
 
 
         public PluginInfo? GetPluginInfo(string pluginId) =>
-       _pluginContainers.Values
+       _loadedPlugins.Values
            .FirstOrDefault(c => string.Equals(
                c.PluginInfo.SystemID, pluginId, StringComparison.OrdinalIgnoreCase))?.PluginInfo;
 
 
         public IEnumerable<IPluginContainer> GetAllPlugins()
-            => _pluginContainers.Values;
+            => _loadedPlugins.Values;
 
         public void SavePluginInfo(PluginInfo info)
         {

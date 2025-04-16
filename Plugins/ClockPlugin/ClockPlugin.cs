@@ -23,18 +23,18 @@ namespace ClockPlugin
             _context.Register<IPluginCommand>(new ResetToDefaultFormatCommand(_pluginSettings));
 
             // Настройки плагина
-            var settingsService = context.SettingsService;
-            _pluginSettings = new PluginSettings<ClockPluginSettings>("ClockPlugin", settingsService);
+            //var settingsService = context.SettingsService;
+            //_pluginSettings = new PluginSettings<ClockPluginSettings>("ClockPlugin", settingsService);
 
-            // Пример использования:
-            var timeFormat = _pluginSettings.Value.ClockFormat;
+            //// Пример использования:
+            //var timeFormat = _pluginSettings.Value.ClockFormat;
 
-            // Обновление значений
-            _pluginSettings.Update(settings =>
-            {
-                settings.ClockFormat = "HH:mm";
-                settings.ShowDate = false;
-            });
+            //// Обновление значений
+            //_pluginSettings.Update(settings =>
+            //{
+            //    settings.ClockFormat = "HH:mm";
+            //    settings.ShowDate = false;
+            //});
         }
 
         public void Shutdown()

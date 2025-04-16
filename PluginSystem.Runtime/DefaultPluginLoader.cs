@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PluginSystem.Runtime
 {
-    public class DefaultPluginLoader : IPluginLoader
+    public class DefaultPluginLoader // :  IPluginLoader
     {
         private readonly IEnumerable<IPluginFactory> _pluginFactories;
 

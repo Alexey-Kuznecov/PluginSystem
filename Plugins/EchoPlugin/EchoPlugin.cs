@@ -14,7 +14,7 @@ namespace EchoPlugin
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+           // throw new NotImplementedException();
         }
     }
 }
