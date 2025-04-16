@@ -79,5 +79,75 @@ namespace PluginSystem.Runtime
 
         public void Undo() => _commandManager.Undo();
         public void Redo() => _commandManager.Redo();
+
+        /// <summary>
+        /// Регистрирует объект, реализующий <see cref="IDisposable"/>, для последующей очистки.
+        /// </summary>
+        public void RegisterDisposable(IDisposable disposable) => _disposables.Add(disposable);
+
+        /// <summary>
+        /// Регистрирует объект настройки, который может использоваться плагином.
+        /// </summary>
+        public void RegisterSetting(object setting) => _settings.Add(setting);
+
+        /// <summary>
+        /// Очищает все зарегистрированные ресурсы, команды и сервисы.
+        /// Вызывается при выгрузке плагина.
+        /// </summary>
+        public void Cleanup()
+        {
+            foreach (var disposable in _disposables)
+            {
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    // логировать ошибку при очистке
+                }
+            }
+
+            _disposables.Clear();
+            _settings.Clear();
+            Commands.Clear();
+            _services.Clear();
+        }
+
+        public void UnregisterAll()
+        {
+            // 1. Попробовать вызвать Dispose/Unload на зарегистрированных сервисах
+            foreach (var serviceList in _services.Values)
+            {
+                foreach (var service in serviceList)
+                {
+                    switch (service)
+                    {
+                        case IDisposable disposable:
+                            disposable.Dispose();
+                            break;
+                        case IPluginUnloadable unloadable:
+                            unloadable.OnUnload(); // если реализуют вручную
+                            break;
+                    }
+                }
+            }
+
+            // 2. Очистка команд
+            Commands.Clear();
+
+            // 3. Очистка сервисов
+            _services.Clear();
+        }
+
+        public void RegisterEventHandler(Delegate handler)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnregisterEventHandler(Delegate handler)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

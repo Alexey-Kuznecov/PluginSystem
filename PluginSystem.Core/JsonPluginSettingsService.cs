@@ -68,5 +68,24 @@ namespace PluginSystem.Core
             var pluginDir = Path.Combine(AppContext.BaseDirectory, "Plugins", pluginName);
             return Path.Combine(pluginDir, "settings.json");
         }
+
+        public void Delete(string pluginName)
+        {
+            var path = GetSettingsPath(pluginName);
+            try
+            {
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true); // Удаляем директорию плагина со всеми файлами
+                }
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                Console.WriteLine($"[Settings] Error deleting settings for '{pluginName}': {ex.Message}");
+#endif
+            }
+        }
     }
 }

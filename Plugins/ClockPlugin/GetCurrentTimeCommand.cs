@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace ClockPlugin
 {
-    public class GetCurrentTimeCommand : IPluginCommand
+    public class GetCurrentTimeCommand : IPluginCommand, IPluginUnloadable
     {
         public string Id => "GCTCommand";
         public string Name => "Get Current Time";
@@ -56,6 +57,14 @@ namespace ClockPlugin
             parameters.Set("format", "HH:mm");
             parameters.Set("showDate", false);
             return parameters;
+        }
+
+        public void OnUnload()
+        {
+            // Например, очистка ссылок, если они тяжелые
+            _pluginSettings?.Save(); // если нужно явно сохранить перед выгрузкой
+            // Можно даже null-нуть:
+            // _pluginSettings = null;
         }
     }
 }

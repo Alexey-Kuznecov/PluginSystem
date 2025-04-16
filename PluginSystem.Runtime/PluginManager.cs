@@ -2,6 +2,7 @@
 
 namespace PluginSystem.Runtime
 {
+    using NLog;
     using NLog.Config;
     using PluginSystem.Core;
     using PluginSystem.Core.PluginSystem.Core;
@@ -140,23 +141,51 @@ namespace PluginSystem.Runtime
 
             _loadedPlugins.Remove(systemId);
 
-            // Вызываем Dispose, если нужно
-            var disposable = container.Plugin as IDisposable;
-            if (disposable != null)
-                disposable.Dispose();
-            
-            container.Unload(); // выгружаем плагин
+            var plugin = container.Plugin;
+            container.Context.UnregisterAll();
+            container.Unload();
+            // 1. Вызов OnUnload (до Dispose)
+            if (plugin is IPluginUnloadable unloadable)
+            {
+                try
+                {
+                    unloadable.OnUnload();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Ошибка в OnUnload() плагина {container.PluginInfo.SystemID}", ex);
+                }
+            }
+
+            // 2. Вызов Dispose
+            if (plugin is IDisposable disposable)
+            {
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Ошибка при вызове Dispose() у плагина {container.PluginInfo.SystemID}", ex);
+                }
+            }
+
+            // 3. Выгрузка сборки
+            container.Unload();
+
+            // 4. Принудительный GC (после удаления всех ссылок)
+            plugin = null;
+            disposable = null;
+            container = null;
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
 
 #if DEBUG
-            if (container?.LoadContext != null) 
-                PluginUnloadDebugger.MonitorUnload(container?.LoadContext, systemId);
-            var types = container?.LoadedAssembly?.GetTypes();
+            PluginUnloadDebugger.MonitorUnload(container?.LoadContext, systemId);
 #endif
-            // Проверяем, что все типы выгружены
-            container = null;
+
             return true;
         }
 

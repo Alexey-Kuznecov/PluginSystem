@@ -56,6 +56,13 @@ namespace PluginSystem.Commands
 
             public IPluginSettingsService SettingsService => throw new NotImplementedException();
 
+            public ILogger Logger => throw new NotImplementedException();
+
+            public void Cleanup()
+            {
+                throw new NotImplementedException();
+            }
+
             public void ExecuteCommand(IPluginCommand command, ICommandContext context)
             {
                 throw new NotImplementedException();
@@ -72,6 +79,31 @@ namespace PluginSystem.Commands
             }
 
             public void Register<T>(T instance) where T : class
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RegisterDisposable(IDisposable disposable)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RegisterEventHandler(Delegate handler)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RegisterSetting(object setting)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void UnregisterAll()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void UnregisterEventHandler(Delegate handler)
             {
                 throw new NotImplementedException();
             }

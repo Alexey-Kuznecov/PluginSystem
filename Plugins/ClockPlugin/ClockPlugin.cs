@@ -40,6 +40,7 @@ namespace ClockPlugin
         public void Shutdown()
         {
             _pluginSettings?.Save();
+            _pluginSettings = null;
         }
 
         public IEnumerable<IPluginCommand> GetCommands()
@@ -52,6 +53,29 @@ namespace ClockPlugin
                 new GetTimeInSecondsCommand(),
                 new ResetToDefaultFormatCommand(_pluginSettings)
             };
+        }
+
+        public void OnUnload()
+        {
+            foreach (var h in _registeredHandlers)
+            {
+                // отписка вручную или через утилиту
+            }
+            _registeredHandlers.Clear();
+            // Очищаем настройки и все связанные ресурсы
+            _pluginSettings = null;
+            _pluginSettings?.Delete();
+            // Удаляем все зарегистрированные команды
+            //_context?.GetRegisteredCommands().Clear();
+        }
+        private void UnregisterHandler(object? sender, EventArgs e)
+        {
+            // Handler logic here
+        }
+
+        private void RegisterHandler(object? sender, EventArgs e)
+        {
+            // Handler logic here
         }
     }
 }

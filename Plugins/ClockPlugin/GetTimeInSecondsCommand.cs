@@ -3,7 +3,7 @@ using PluginSystem.Core;
 
 namespace ClockPlugin
 {
-    public class GetTimeInSecondsCommand : IPluginCommand
+    public class GetTimeInSecondsCommand : IPluginCommand, IPluginUnloadable
     {
         private readonly List<string> _expectedParameters = new() { "format", "timezone" };
 
@@ -43,6 +43,11 @@ namespace ClockPlugin
             parameters.Set("format", "HH:mm");
             parameters.Set("timezone", "local");
             return parameters;
+        }
+
+        public void OnUnload()
+        {
+            //throw new NotImplementedException();
         }
     }
 }

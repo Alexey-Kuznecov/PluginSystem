@@ -43,5 +43,12 @@ namespace PluginSystem.Core
         {
             updateAction.Invoke(Value); // сохранение произойдёт автоматически
         }
+
+        public void Delete()
+        {
+            _settingsService.Delete(_pluginName);
+            _settings = null;
+            _loaded = false;
+        }
     }
 }

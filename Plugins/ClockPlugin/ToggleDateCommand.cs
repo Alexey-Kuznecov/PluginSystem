@@ -1,10 +1,11 @@
 ﻿
 
 using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace ClockPlugin
 {
-    public class ToggleDateCommand : IPluginCommand
+    public class ToggleDateCommand : IPluginCommand, IPluginUnloadable
     {
         public string Id => "ToggleDateCommand";
         public string Name => "ToggleDateCommand";
@@ -58,6 +59,14 @@ namespace ClockPlugin
             var parameters = new CommandParameters();
             parameters.Set("forceState", "toggle"); // toggle = поведение по умолчанию (переключить)
             return parameters;
+        }
+
+        public void OnUnload()
+        {
+            // Например, очистка ссылок, если они тяжелые
+            _pluginSettings?.Save(); // если нужно явно сохранить перед выгрузкой
+            // Можно даже null-нуть:
+            // _pluginSettings = null;
         }
     }
 }

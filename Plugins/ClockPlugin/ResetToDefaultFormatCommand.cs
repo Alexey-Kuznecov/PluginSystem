@@ -1,9 +1,10 @@
 ﻿
 using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace ClockPlugin
 {
-    public class ResetToDefaultFormatCommand : IPluginCommand
+    public class ResetToDefaultFormatCommand : IPluginCommand, IPluginUnloadable
     {
         public string Id => "ResetToDefaultFormatCommand";
         public string Name => "Reset Clock Format";
@@ -73,6 +74,14 @@ namespace ClockPlugin
             var parameters = new CommandParameters();
             parameters.Set("confirm", "no"); // по умолчанию сброс не происходит
             return parameters;
+        }
+
+        public void OnUnload()
+        {
+            // Например, очистка ссылок, если они тяжелые
+            _pluginSettings?.Save(); // если нужно явно сохранить перед выгрузкой
+            // Можно даже null-нуть:
+            // _pluginSettings = null;
         }
     }
 }
