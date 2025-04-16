@@ -1,5 +1,6 @@
 ﻿
 using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace ClockPlugin
 {

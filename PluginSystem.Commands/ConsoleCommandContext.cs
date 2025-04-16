@@ -1,4 +1,5 @@
 ﻿
+using NLog;
 using PluginSystem.Core;
 
 namespace PluginSystem.Commands

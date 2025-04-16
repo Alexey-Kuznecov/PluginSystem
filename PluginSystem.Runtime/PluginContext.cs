@@ -1,25 +1,54 @@
 ﻿
 namespace PluginSystem.Runtime
 {
+    using NLog;
     using PluginSystem.Core;
+    using PluginSystem.Core.PluginSystem.Core;
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Контекст плагина, предоставляющий доступ к сервисам, командам, настройкам и механизмам управления жизненным циклом.
+    /// Используется внутри плагинов для регистрации зависимостей и взаимодействия с хост-приложением.
+    /// </summary>
     public class PluginContext : IPluginContext
     {
         private readonly Dictionary<Type, List<object>> _services = new();
-        public List<IPluginCommand> Commands { get; } = new();
-        public Dictionary<string, string> PluginSettings { get; } = new();
-        public IPluginSettingsService SettingsService { get; }
+        private readonly List<IDisposable> _disposables = new();
+        private readonly List<object> _settings = new();
         private readonly CommandManager _commandManager;
 
+        /// <summary>
+        /// Коллекция зарегистрированных команд плагина.
+        /// </summary>
+        public List<IPluginCommand> Commands { get; } = new();
+
+        /// <summary>
+        /// Настройки плагина в формате "ключ-значение".
+        /// </summary>
+        public Dictionary<string, string> PluginSettings { get; } = new();
+
+        /// <summary>
+        /// Сервис для сохранения и загрузки пользовательских настроек плагина.
+        /// </summary>
+        public IPluginSettingsService SettingsService { get; }
+
+        public ILogger Logger => throw new NotImplementedException();
+
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="PluginContext"/> с указанным путём к файлу настроек.
+        /// </summary>
+        /// <param name="path">Путь к файлу, в котором будут храниться настройки плагина.</param>
         public PluginContext(string path)
         {
             SettingsService = new JsonPluginSettingsService(path);
             _commandManager = new CommandManager();
         }
 
+        /// <summary>
+        /// Регистрирует реализацию интерфейса <typeparamref name="TService"/> через создание нового экземпляра <typeparamref name="TImplementation"/>.
+        /// </summary>
         public void Register<TService, TImplementation>()
             where TImplementation : TService, new()
             where TService : class
@@ -28,6 +57,12 @@ namespace PluginSystem.Runtime
             Register<TService>(implementation);
         }
 
+        /// <summary>
+        /// Регистрирует экземпляр сервиса или команды.
+        /// </summary>
+        /// <typeparam name="T">Тип сервиса.</typeparam>
+        /// <param name="instance">Экземпляр для регистрации.</param>
+        /// <exception cref="ArgumentNullException">Если instance равен null.</exception>
         public void Register<T>(T instance) where T : class
         {
             if (instance == null)
@@ -46,6 +81,11 @@ namespace PluginSystem.Runtime
             }
         }
 
+        /// <summary>
+        /// Получает первый зарегистрированный сервис типа <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">Тип сервиса.</typeparam>
+        /// <returns>Экземпляр сервиса или null, если не найден.</returns>
         public T? GetService<T>() where T : class
         {
             var type = typeof(T);
@@ -55,12 +95,18 @@ namespace PluginSystem.Runtime
             return null;
         }
 
+        /// <summary>
+        /// Получает все зарегистрированные сервисы типа <typeparamref name="T"/>.
+        /// </summary>
         public IEnumerable<T> GetServices<T>() where T : class
         {
             var type = typeof(T);
             return _services.TryGetValue(type, out var list) ? list.OfType<T>() : Enumerable.Empty<T>();
         }
 
+        /// <summary>
+        /// Устанавливает строковое значение настройки по ключу.
+        /// </summary>
         public void SetPluginSetting(string key, string value)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -69,15 +115,31 @@ namespace PluginSystem.Runtime
             PluginSettings[key] = value;
         }
 
+        /// <summary>
+        /// Получает значение настройки по ключу.
+        /// </summary>
         public string? GetPluginSetting(string key) =>
             PluginSettings.TryGetValue(key, out string value) ? value : null;
 
+        /// <summary>
+        /// Возвращает список всех зарегистрированных команд.
+        /// </summary>
         public List<IPluginCommand> GetRegisteredCommands() => Commands;
 
+        /// <summary>
+        /// Выполняет команду с использованием переданного контекста.
+        /// </summary>
         public void ExecuteCommand(IPluginCommand command, ICommandContext context) =>
             _commandManager.ExecuteCommand(command, context);
 
+        /// <summary>
+        /// Отменяет последнюю выполненную команду (если поддерживается).
+        /// </summary>
         public void Undo() => _commandManager.Undo();
+
+        /// <summary>
+        /// Повторяет отменённую команду (если поддерживается).
+        /// </summary>
         public void Redo() => _commandManager.Redo();
 
         /// <summary>
