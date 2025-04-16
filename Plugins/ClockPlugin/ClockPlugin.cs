@@ -1,24 +1,35 @@
 ﻿
 using PluginSystem.Core;
+using PluginSystem.Core.PluginSystem.Core;
 
 namespace ClockPlugin
 {
-    public class ClockPlugin : IPlugin, ICommandProvider
+    public class ClockPlugin : IPlugin, ICommandProvider, IPluginUnloadable
     {
         public string Name => "ClockPlugin";
         public string Version => "3.0";
 
-        private IPluginContext _context;
+        private IPluginContext _context; 
 
-        private PluginSettings<ClockPluginSettings>? _pluginSettings;
+        private PluginSettings<ClockPluginSettingsPropertyChanged>? _pluginSettings; // Change the type to match the expected type
+        private readonly List<Delegate> _registeredHandlers = new ();
+        // Assuming `someEvent` and `handler` are placeholders for actual event and handler references,
+        // you need to define them properly. Below is an example fix:
+
+        // Define the event and handler
+        private event EventHandler? someEvent;
 
         public void Initialize(IPluginContext context)
         {
             _context = context;
-            _context.Register<IPluginCommand>(new ClockCommand());
+
+            // Update the instantiation of PluginSettings to use ClockPluginSettings instead of ClockPluginSettings2
+            _pluginSettings = new PluginSettings<ClockPluginSettingsPropertyChanged>("ClockPlugin", context.SettingsService);
+
+            // Register commands with the corrected _pluginSettings type
             _context.Register<IPluginCommand>(new GetCurrentTimeCommand(_pluginSettings));
-            _context.Register<IPluginCommand>(new SetTimeFormatCommand(_pluginSettings));
-            _context.Register<IPluginCommand>(new ToggleDateCommand(_pluginSettings));
+            //_context.Register<IPluginCommand>(new SetTimeFormatCommand(_pluginSettings));
+            //_context.Register<IPluginCommand>(new ToggleDateCommand(_pluginSettings));
             _context.Register<IPluginCommand>(new GetTimeInSecondsCommand());
             //_context.Register<IPluginCommand>(new ResetToDefaultFormatCommand(_pluginSettings));
         }
@@ -32,13 +43,13 @@ namespace ClockPlugin
         public IEnumerable<IPluginCommand> GetCommands()
         {
             return new List<IPluginCommand>
-            {
-                new GetCurrentTimeCommand(_pluginSettings),
-                new SetTimeFormatCommand(_pluginSettings),
-                new ToggleDateCommand(_pluginSettings),
-                new GetTimeInSecondsCommand(),
-                new ResetToDefaultFormatCommand(_pluginSettings)
-            };
+        {
+            new GetCurrentTimeCommand(_pluginSettings),
+            ////new SetTimeFormatCommand(_pluginSettings),
+            //new ToggleDateCommand(_pluginSettings),
+            new GetTimeInSecondsCommand(),
+            //new ResetToDefaultFormatCommand(_pluginSettings)
+        };
         }
 
         public void OnUnload()
@@ -65,4 +76,4 @@ namespace ClockPlugin
         }
     }
 }
- 
+

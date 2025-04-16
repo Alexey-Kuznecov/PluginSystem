@@ -19,16 +19,16 @@ namespace ClockPlugin
         public IReadOnlyList<string> ExpectedParameters => _expectedParameters;
         private readonly List<string> _expectedParameters = new() { "format", "showDate" };
 
-        private readonly PluginSettings<ClockPluginSettings>? _pluginSettings;
+        private readonly PluginSettings<ClockPluginSettingsPropertyChanged>? _pluginSettings;
 
-        public GetCurrentTimeCommand(PluginSettings<ClockPluginSettings>? pluginSettings)
+        public GetCurrentTimeCommand(PluginSettings<ClockPluginSettingsPropertyChanged>? pluginSettings)
         {
             _pluginSettings = pluginSettings;
         }
 
         public void Execute(ICommandContext context)
         {
-            var settings = _pluginSettings?.Value ?? new ClockPluginSettings();
+            var settings = _pluginSettings?.Value ?? new ClockPluginSettingsPropertyChanged();
 
             // Получаем параметры из контекста или используем из настроек
             var format = context.Parameters.Get<string>("format") ?? settings.ClockFormat ?? "HH:mm";
