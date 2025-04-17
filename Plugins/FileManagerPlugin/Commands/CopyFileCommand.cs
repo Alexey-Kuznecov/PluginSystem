@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using PluginSystem.Core.PluginSystem.Core;
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
+using PluginSystem.Abstractions.Plugin.PluginSystem.Core;
 
 namespace FileManagerPlugin.Commands;
 
@@ -16,11 +19,11 @@ public class CopyFileCommand : IPluginCommand, IPluginUnloadable
     public IReadOnlyList<string> ExpectedParameters => new[] { "source", "destination" };
 
     public bool CanUndo => false;
-    public void Undo(ICommandContext context) { }
+    public void Undo(IPluginCommandContext context) { }
 
     public ICommandParameters GetDefaultParameters() => new CommandParameters();
 
-    public void Execute(ICommandContext context)
+    public void Execute(IPluginCommandContext context)
     {
         var source = context.Parameters.Get<string>("source");
         var destination = context.Parameters.Get<string>("destination");

@@ -1,12 +1,14 @@
 ﻿
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
 using PluginSystem.Core;
 
 namespace PluginSystem.Runtime
 {
     public class CommandManager
     {
-        private readonly Stack<(IPluginCommand, ICommandContext)> _undoStack = new();
-        private readonly Stack<(IPluginCommand, ICommandContext)> _redoStack = new();
+        private readonly Stack<(IPluginCommand, IPluginCommandContext)> _undoStack = new();
+        private readonly Stack<(IPluginCommand, IPluginCommandContext)> _redoStack = new();
         private readonly List<IPluginCommand> _commands = new(); // Список всех доступных команд
         private readonly List<IPluginCommand> _allCommands = new();
 
@@ -33,7 +35,7 @@ namespace PluginSystem.Runtime
             return _allCommands;
         }
 
-        public void ExecuteCommand(IPluginCommand command, ICommandContext context)
+        public void ExecuteCommand(IPluginCommand command, IPluginCommandContext context)
         {
             command.Execute(context);
 
@@ -91,12 +93,12 @@ namespace PluginSystem.Runtime
 
             public bool CanUndo => _undo != null;
 
-            public void Execute(ICommandContext context)
+            public void Execute(IPluginCommandContext context)
             {
                 _execute(context);
             }
 
-            public void Undo(ICommandContext context)
+            public void Undo(IPluginCommandContext context)
             {
                 if (_undo == null)
                     throw new InvalidOperationException("Undo operation is not supported for this command.");

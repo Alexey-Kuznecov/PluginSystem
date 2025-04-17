@@ -1,6 +1,7 @@
 ﻿
 using PluginSystem.Core;
 using System.Diagnostics.CodeAnalysis;
+using PluginSystem.Abstractions.Commands;
 
 namespace PluginSystem.Commands
 {

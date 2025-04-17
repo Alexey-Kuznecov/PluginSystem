@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PluginSystem.Abstractions.Commands;
 
 namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
@@ -18,7 +19,7 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
         public string Name => "suggest";
         public string Description => "Предлагает команды, начинающиеся с указанного ввода.";
 
-        public void Execute(CommandContext context)
+        public void Execute(IConsoleCommandContext context)
         {
             if (context.Arguments.Length == 0)
             {

@@ -1,6 +1,7 @@
 ﻿
 namespace PluginSystem.Runtime
 {
+    using PluginSystem.Abstractions.Plugin;
     using PluginSystem.Core;
     using PluginSystem.Core.PluginSystem.Core;
     using System.Xml.Linq;

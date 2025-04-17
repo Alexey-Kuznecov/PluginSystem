@@ -1,5 +1,6 @@
-﻿using PluginSystem.Core.Abstractions;
+﻿
 using System.Collections;
+using PluginSystem.Abstractions.Commands;
 
 namespace PluginSystem.Hosting.ConsoleCommands
 {
@@ -15,7 +16,7 @@ namespace PluginSystem.Hosting.ConsoleCommands
             throw new NotImplementedException();
         }
 
-        public void Register<T>(string command, T instance)
+        void IConsoleCommandRegistry.Register<T>(string name, T instance)
         {
             throw new NotImplementedException();
         }

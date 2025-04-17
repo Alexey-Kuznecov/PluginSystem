@@ -1,4 +1,5 @@
-﻿using PluginSystem.Core.PluginSystem.Core;
+﻿using PluginSystem.Abstractions.Commands;
+using PluginSystem.Core.PluginSystem.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +56,7 @@ namespace PluginSystem.Hosting.ConsoleCommands
             {
                 try
                 {
-                    var context = new CommandContext(_services, _output, args);
+                    var context = new ConsoleCommandContext(_services, _output, args);
                     command.Execute(context);
                     return true;
                 }

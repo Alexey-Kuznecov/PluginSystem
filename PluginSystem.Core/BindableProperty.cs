@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PluginSystem.Abstractions.Plugin;
 
 namespace PluginSystem.Core
 {

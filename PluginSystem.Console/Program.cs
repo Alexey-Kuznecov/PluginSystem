@@ -7,6 +7,7 @@ using PluginSystem.Hosting.ConsoleCommands;
 using PluginSystem.Hosting.ConsoleCommands.Commands;
 using PluginSystem.Runtime;
 using System;
+using PluginSystem.Abstractions.Services;
 
 class Program
 {

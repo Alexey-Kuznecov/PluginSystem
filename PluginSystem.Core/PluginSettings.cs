@@ -1,9 +1,12 @@
 ﻿using PluginSystem.Core;
 using System;
 using System.ComponentModel;
+using PluginSystem.Abstractions.Services;
+using PluginSystem.Abstractions.Settings;
+
 namespace PluginSystem.Core
 {
-    public class PluginSettings<T> : IDisposable where T : class, INotifyPropertyChanged, new()
+    public class PluginSettings<T> : IPluginSettings<T> where T : class, INotifyPropertyChanged, new()
     {
         private readonly string _pluginName;
         private readonly IPluginSettingsService _settingsService;

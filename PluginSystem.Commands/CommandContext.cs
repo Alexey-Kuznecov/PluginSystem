@@ -1,9 +1,11 @@
 ﻿
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
 using PluginSystem.Core;
 
 namespace PluginSystem.Commands
 {
-    public class CommandContext : ICommandContext
+    public class CommandContext : IPluginCommandContext
     {
         public IPlugin Plugin { get; set; } = null!;
         public PluginInfo Info { get; set; } = null!;

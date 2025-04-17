@@ -1,4 +1,7 @@
 ﻿
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
+
 namespace PluginSystem.Console
 {
     using PluginSystem.Commands;

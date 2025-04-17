@@ -1,8 +1,11 @@
 ﻿
+using PluginSystem.Abstractions.Commands;
 using PluginSystem.Core;
 using PluginSystem.Core.PluginSystem.Core;
 using PluginSystem.Hosting.ConsoleCommands;
 using System.Runtime;
+using PluginSystem.Abstractions.Plugin;
+using PluginSystem.Abstractions.Plugin.PluginSystem.Core;
 
 namespace DemoFileManagerPlugin;
 
@@ -17,12 +20,16 @@ public sealed class DemoFilePlugin : IPlugin, IPluginUnloadable
     public void Initialize(IPluginContext context)
     {
         _context = context;
+
+        // А с этим что делать?
         _settingsManager = new PluginSettings<DemoSettings>(
             context.PluginId,
             new JsonPluginSettingsService(context.PluginDirectory)
         );
-        context.Commands.Register("demo.settings.show", ShowSettings);
-        context.Commands.Register("demo.settings.update", UpdateSetting);
+        
+        //context.Commands.Register<ShowSettingsCommands>("demo.settings.show", new ShowSettingsCommands()); // Это уже не нужно? 
+        var module = new DemoCommandModule(context.Commands, _settingsManager); // Как получить и где взять?
+        module.RegisterCommands();
         // Пример изменения
         _settingsManager.Update(s => s.ShowHiddenFiles = true);
         _context.Logger.Info($"[{Name}] Настройки загружены. Копировать в: {_settingsManager}");
@@ -50,54 +57,6 @@ public sealed class DemoFilePlugin : IPlugin, IPluginUnloadable
     public void Shutdown()
     {
         // Пока не используется, можно добавить при необходимости
-    }
-
-    private void ShowSettings(CommandContext ctx, IConsoleOutput output)
-    {
-        var s = _settingsManager?.Value;
-        if (s == null)
-        {
-            output.WriteLine("Settings not loaded.");
-            return;
-        }
-
-        output.WriteLine($"ShowHiddenFiles: {s.ShowHiddenFiles}");
-        output.WriteLine($"SortMode: {s.SortMode}");
-    }
-
-    private void UpdateSetting(CommandContext ctx, IConsoleOutput output)
-    {
-        if (ctx.Arguments.Length < 2)
-        {
-            output.WriteLine("Usage: demo.settings.update <property> <value>");
-            return;
-        }
-
-        var prop = ctx.Arguments[0].ToLowerInvariant();
-        var val = ctx.Arguments[1];
-
-        _settingsManager?.Update(s =>
-        {
-            switch (prop)
-            {
-                case "showhiddenfiles":
-                    if (bool.TryParse(val, out var b))
-                        s.ShowHiddenFiles = b;
-                    else
-                        output.WriteLine("Invalid boolean value.");
-                    break;
-
-                case "sortmode":
-                    s.SortMode = val;
-                    break;
-
-                default:
-                    output.WriteLine($"Unknown setting: {prop}");
-                    break;
-            }
-        });
-
-        output.WriteLine("Setting updated.");
     }
 }
 

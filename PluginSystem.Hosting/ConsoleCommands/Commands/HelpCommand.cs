@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PluginSystem.Abstractions.Commands;
 
 namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
@@ -19,7 +20,7 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
         public string Description => "Показывает список доступных команд или справку по конкретной команде.";
         public IEnumerable<string> Aliases => new[] { "?", "h" };
 
-        public void Execute(CommandContext context)
+        public void Execute(ConsoleCommandContext context)
         {
             var args = context.Arguments;
 
@@ -51,6 +52,11 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
                     context.Output.WriteError($"Команда \"{name}\" не найдена.");
                 }
             }
+        }
+
+        public void Execute(IConsoleCommandContext context)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<string> GetSuggestions(string[] args)

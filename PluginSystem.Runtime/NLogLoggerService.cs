@@ -1,4 +1,6 @@
 ﻿
+using PluginSystem.Abstractions.Services;
+
 namespace PluginSystem.Runtime
 {
     using NLog;

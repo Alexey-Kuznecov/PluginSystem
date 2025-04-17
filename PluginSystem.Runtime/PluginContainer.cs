@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Xml.Linq;
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
 
 namespace PluginSystem.Runtime
 {

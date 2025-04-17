@@ -1,4 +1,5 @@
 ﻿
+using PluginSystem.Abstractions.Plugin;
 using PluginSystem.Core;
 
 namespace PluginSystem.Runtime

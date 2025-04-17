@@ -1,10 +1,13 @@
 ﻿
 using NLog;
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
+using PluginSystem.Abstractions.Services;
 using PluginSystem.Core;
 
 namespace PluginSystem.Commands
 {
-    public class ConsoleCommandContext : ICommandContext
+    public class ConsoleCommandContext : IPluginCommandContext
     {
         // Синглтон-инстанс
         public static ConsoleCommandContext Instance { get; } = new ConsoleCommandContext();
@@ -51,21 +54,17 @@ namespace PluginSystem.Commands
 
         public class NullPluginContext : IPluginContext
         {
+            private List<IPluginCommand> _commands;
+            private IConsoleCommandRegistry _commands1;
             public static IPluginContext Instance { get; } = new NullPluginContext();
 
-            public List<IPluginCommand> Commands => throw new NotImplementedException();
 
-            public IPluginSettingsService SettingsService => throw new NotImplementedException();
+            public T Load<T>(string pluginId) where T : class, new()
+            {
+                throw new NotImplementedException();
+            }
 
-            public ILogger Logger => throw new NotImplementedException();
-
-            public string PluginId => throw new NotImplementedException();
-
-            public IPluginSettingsService Settings => throw new NotImplementedException();
-
-            public string PluginDirectory => throw new NotImplementedException();
-
-            public void Cleanup()
+            public void Save<T>(string pluginId, T settings) where T : class
             {
                 throw new NotImplementedException();
             }
@@ -75,7 +74,7 @@ namespace PluginSystem.Commands
                 throw new NotImplementedException();
             }
 
-            public void ExecuteCommand(IPluginCommand command, ICommandContext context)
+            public void Register<T>(T instance) where T : class
             {
                 throw new NotImplementedException();
             }
@@ -90,17 +89,23 @@ namespace PluginSystem.Commands
                 throw new NotImplementedException();
             }
 
-            public T Load<T>(string pluginId) where T : class, new()
+            public string PluginId { get; }
+
+            IConsoleCommandRegistry IPluginContext.Commands => _commands1;
+
+            public IPluginSettingsService Settings { get; }
+            public string PluginDirectory { get; }
+            public ILogger Logger { get; }
+
+            List<IPluginCommand> IPluginCommandHost.Commands => _commands;
+
+            public void ExecuteCommand(IPluginCommand command, IPluginCommandContext context)
             {
                 throw new NotImplementedException();
             }
 
-            public void Register<T>(T instance) where T : class
-            {
-                throw new NotImplementedException();
-            }
-
-            public void RegisterDisposable(IDisposable disposable)
+            public IPluginSettingsService SettingsService { get; }
+            public void RegisterSetting(object setting)
             {
                 throw new NotImplementedException();
             }
@@ -110,12 +115,12 @@ namespace PluginSystem.Commands
                 throw new NotImplementedException();
             }
 
-            public void RegisterSetting(object setting)
+            public void UnregisterEventHandler(Delegate handler)
             {
                 throw new NotImplementedException();
             }
 
-            public void Save<T>(string pluginId, T settings) where T : class
+            public void RegisterDisposable(IDisposable disposable)
             {
                 throw new NotImplementedException();
             }
@@ -125,7 +130,7 @@ namespace PluginSystem.Commands
                 throw new NotImplementedException();
             }
 
-            public void UnregisterEventHandler(Delegate handler)
+            public void Cleanup()
             {
                 throw new NotImplementedException();
             }

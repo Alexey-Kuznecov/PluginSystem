@@ -1,4 +1,8 @@
-﻿#define DEBUG 
+﻿#define DEBUG
+
+using PluginSystem.Abstractions.Plugin;
+using PluginSystem.Abstractions.Plugin.PluginSystem.Core;
+using PluginSystem.Abstractions.Services;
 
 namespace PluginSystem.Runtime
 {

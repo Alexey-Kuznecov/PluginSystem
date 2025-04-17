@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PluginSystem.Abstractions.Commands;
 using PluginSystem.Core;
 using PluginSystem.Core.PluginSystem.Core;
 using PluginSystem.Runtime;
@@ -24,7 +25,7 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
             _output = output;
         }
 
-        public void Execute(CommandContext context)
+        public void Execute(IConsoleCommandContext context)
         {
             _pluginManager = context.Services.GetService<IPluginManager>();
             var args = context.Arguments;

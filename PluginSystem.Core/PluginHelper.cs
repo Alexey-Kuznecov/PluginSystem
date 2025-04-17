@@ -1,6 +1,7 @@
 ﻿
 using System.Security.Cryptography;
 using System.Text;
+using PluginSystem.Abstractions.Plugin;
 
 namespace PluginSystem.Core
 {

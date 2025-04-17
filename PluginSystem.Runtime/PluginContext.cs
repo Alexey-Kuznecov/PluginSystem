@@ -1,7 +1,12 @@
 ﻿
+using PluginSystem.Abstractions.Plugin;
+using PluginSystem.Abstractions.Plugin.PluginSystem.Core;
+using PluginSystem.Abstractions.Services;
+
 namespace PluginSystem.Runtime
 {
     using NLog;
+    using PluginSystem.Abstractions.Commands;
     using PluginSystem.Core;
     using PluginSystem.Core.PluginSystem.Core;
     using System;
@@ -18,6 +23,11 @@ namespace PluginSystem.Runtime
         private readonly List<IDisposable> _disposables = new();
         private readonly List<object> _settings = new();
         private readonly CommandManager _commandManager;
+        private readonly IPluginSettingsService _settingsService;
+        private readonly ILogger _logger;
+        private readonly IConsoleCommandRegistry _commandRegistry;
+        private readonly string _pluginId;
+        private readonly string _pluginDirectory;
 
         /// <summary>
         /// Коллекция зарегистрированных команд плагина.
@@ -32,9 +42,22 @@ namespace PluginSystem.Runtime
         /// <summary>
         /// Сервис для сохранения и загрузки пользовательских настроек плагина.
         /// </summary>
-        public IPluginSettingsService SettingsService { get; }
+        public IPluginSettingsService SettingsService { get; } = new JsonPluginSettingsService();
 
-        public ILogger Logger => throw new NotImplementedException();
+        // ILogger
+        public ILogger Logger => _logger;
+
+        // PluginId
+        public string PluginId => _pluginId;
+
+        // IConsoleCommandRegistry
+        IConsoleCommandRegistry IPluginContext.Commands => _commandRegistry;
+
+        // Settings (интерфейс для работы с настройками плагина)
+        public IPluginSettingsService Settings => _settingsService;
+
+        // PluginDirectory
+        public string PluginDirectory => _pluginDirectory;
 
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="PluginContext"/> с указанным путём к файлу настроек.
@@ -44,6 +67,20 @@ namespace PluginSystem.Runtime
         {
             SettingsService = new JsonPluginSettingsService(path);
             _commandManager = new CommandManager();
+        }
+
+        public PluginContext(
+            IPluginSettingsService settingsService,
+            ILogger logger,
+            IConsoleCommandRegistry commandRegistry,
+            string pluginId,
+            string pluginDirectory)
+        {
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _commandRegistry = commandRegistry ?? throw new ArgumentNullException(nameof(commandRegistry));
+            _pluginId = pluginId ?? throw new ArgumentNullException(nameof(pluginId));
+            _pluginDirectory = pluginDirectory ?? throw new ArgumentNullException(nameof(pluginDirectory));
         }
 
         /// <summary>
@@ -129,7 +166,7 @@ namespace PluginSystem.Runtime
         /// <summary>
         /// Выполняет команду с использованием переданного контекста.
         /// </summary>
-        public void ExecuteCommand(IPluginCommand command, ICommandContext context) =>
+        public void ExecuteCommand(IPluginCommand command, IPluginCommandContext context) =>
             _commandManager.ExecuteCommand(command, context);
 
         /// <summary>
@@ -201,15 +238,38 @@ namespace PluginSystem.Runtime
             // 3. Очистка сервисов
             _services.Clear();
         }
-
+        // Registering Event Handlers
         public void RegisterEventHandler(Delegate handler)
         {
-            throw new NotImplementedException();
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            // Реализуйте регистрацию обработчика событий, возможно, через события плагина или внешние сервисы.
+            _logger.Debug($"Event handler {handler.Method.Name} registered.", handler);
         }
 
+        // Unregistering Event Handlers
         public void UnregisterEventHandler(Delegate handler)
         {
-            throw new NotImplementedException();
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            // Реализуйте отмену регистрации обработчика событий.
+            _logger.Debug($"Event handler {handler.Method.Name} unregistered.");
+        }
+
+        // Load settings
+        public T Load<T>(string pluginId) where T : class, new()
+        {
+            return _settingsService.Load<T>(pluginId);
+        }
+
+        // Save settings
+        public void Save<T>(string pluginId, T settings) where T : class
+        {
+            _settingsService.Save(pluginId, settings);
+        }
+
+        // Delete settings
+        public void Delete(string pluginId)
+        {
+            _settingsService.Delete(pluginId);
         }
     }
 }

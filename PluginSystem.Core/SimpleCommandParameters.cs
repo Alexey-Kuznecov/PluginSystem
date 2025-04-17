@@ -1,4 +1,6 @@
 ﻿
+using PluginSystem.Abstractions.Commands;
+
 namespace PluginSystem.Core
 {
     public class SimpleCommandParameters : ICommandParameters

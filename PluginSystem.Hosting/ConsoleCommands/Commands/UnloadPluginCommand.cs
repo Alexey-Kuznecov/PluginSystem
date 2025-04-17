@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PluginSystem.Abstractions.Commands;
 
 namespace PluginSystem.Hosting.ConsoleCommands.Commands
 {
@@ -19,7 +20,7 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
         public string Name => "unload";
         public string Description => "Выгружает плагин по его ID";
 
-        public void Execute(CommandContext context)
+        public void Execute(IConsoleCommandContext context)
         {
             _pluginManager = context.Services.GetService<IPluginManager>();
             var pluginId = context.Arguments.ElementAtOrDefault(0);

@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using PluginSystem.Core;
 using System.Text.Json;
+using PluginSystem.Abstractions.Commands;
+using PluginSystem.Abstractions.Plugin;
 using PluginSystem.Runtime;
 
 namespace PluginSystem.Hosting.ConsoleCommands.Commands
@@ -11,7 +13,7 @@ namespace PluginSystem.Hosting.ConsoleCommands.Commands
         public string Name => "list";
         public string Description => "Показать список плагинов.";
 
-        public void Execute(CommandContext context)
+        public void Execute(IConsoleCommandContext context)
         {
             bool verbose = context.Arguments.Contains("--verbose");
             bool json = context.Arguments.Contains("--json");

@@ -1,4 +1,6 @@
 ﻿
+using PluginSystem.Abstractions.Plugin;
+
 namespace PluginSystem.Core
 {
     using System;
@@ -24,23 +26,11 @@ namespace PluginSystem.Core
             IEnumerable<IPluginContainer> LoadAllPlugins();
 
             /// <summary>
-            /// Перезагружает плагин.
-            /// </summary>
-            /// <param name="name">Имя плагина.</param>
-            /// <returns>true, если успешно.</returns>
-            //bool ReloadPlugin(string name);
-
-            /// <summary>
             /// Выгружает плагин по имени.
             /// </summary>
             /// <param name = "name" > Имя плагина.</param>
             /// <returns>true, если успешно выгружен.</returns>
             bool UnloadPlugin(string name);
-
-            /// <summary>
-            /// Выгружает все загруженные плагины.
-            /// </summary>
-            //void UnloadAll();
 
             /// <summary>
             /// Проверяет, загружен ли плагин.
@@ -68,12 +58,6 @@ namespace PluginSystem.Core
             /// </summary>
             /// <returns>Список плагинов.</returns>
             IEnumerable<IPluginContainer> GetAllPlugins();
-
-            /// <summary>
-            /// Регистрирует плагин вручную (в обход автозагрузки).
-            /// </summary>
-            /// <param name="plugin">Плагин для регистрации.</param>
-            //void RegisterPlugin(IPlugin plugin);
 
             /// <summary>
             /// Событие, возникающее при успешной загрузке плагина.

@@ -1,11 +1,6 @@
-﻿using PluginSystem.Core.Abstractions;
-using PluginSystem.Hosting.ConsoleCommands;
+﻿
 using PluginSystem.Hosting.ConsoleCommands.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PluginSystem.Abstractions.Commands;
 
 namespace PluginSystem.Hosting.ConsoleCommands
 {
@@ -27,11 +22,17 @@ namespace PluginSystem.Hosting.ConsoleCommands
 
         public void RegisterBuiltInCommands()
         {
+            var command = new HelpCommand(_dispatcher);
             // Здесь можно добавить встроенные команды, например: help, clear, exit и т.д.
-            _registry.Register(new HelpCommand(_registry)); // пример
+            _registry.Register(command.Name, command); // пример
         }
 
-        public void Dispatch(string input, CommandContext context)
-            => _dispatcher.Execute(input, context);
+        public void Dispatch(string input, ConsoleCommandContext context)
+        {
+            _registry.RegisterLambda("hello", "Печатает приветствие", (ctx, output) =>
+            {
+                output.WriteLine("Привет из лямбда-команды!");
+            });
+        }
     }
 }

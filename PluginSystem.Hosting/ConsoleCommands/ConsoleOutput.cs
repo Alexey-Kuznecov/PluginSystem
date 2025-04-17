@@ -1,4 +1,4 @@
-﻿using PluginSystem.Hosting.ConsoleCommands;
+﻿using PluginSystem.Abstractions.Commands;
 
 public class ConsoleOutput : IConsoleOutput
 {
